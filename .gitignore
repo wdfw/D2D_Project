@@ -1,0 +1,14 @@
+D2D_Project/bin/*
+D2D_Project/CMakeFiles/
+D2D_Project/icons/
+D2D_Project/resources/
+D2D_Project/result/*
+D2D_Project/cmake_install.cmake
+D2D_Project/CMakeCache.txt
+D2D_Project/log
+D2D_Project/Makefile
+
+D2D_Project/D2D_Gui/icons
+D2D_Project/D2D_Gui/resources
+
+.vscode

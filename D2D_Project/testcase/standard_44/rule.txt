@@ -1,0 +1,8 @@
+minimum_via_pad_spacing 22
+via_opening_diameter 15
+via_pad_diameter 19
+minimum_line_width 2
+minimum_line_spacing 2
+minimum_line_via_spacing 2
+minimum_via_spacing 8
+minimum_teardropDist 12
