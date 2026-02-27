@@ -1,0 +1,87 @@
+安裝套件:
+    ## Install CGAL and QT5
+    $ sudo apt update
+    $ sudo apt install libcgal-dev 
+    $ sudo apt install libcgal-qt5-dev 
+
+    ## Install boost
+    ### boost 1.80
+    $ cd ~
+    $ wget https://archives.boost.io/release/1.80.0/source/boost_1_80_0.tar.gz
+    $ tar -xvzf boost_1_80_0.tar.gz
+    $ cd boost_1_80_0
+    $ mkdir -p ~/myPackage/boost_1_80_0
+    $ ./bootstrap.sh --prefix=$HOME/myPackage/boost_1_80_0
+    $ ./b2 install --prefix=$HOME/myPackage/boost_1_80_0
+    $ rm ~/boost_1_80_0.tar.gz
+    $ rm ~/boost_1_80_0
+    ### set environment variable
+    $ vim ~/.bashrc
+    $ export BOOST_ROOT=$HOME/myPackage/boost_1_80_0
+    $ export LD_LIBRARY_PATH=$HOME/myPackage/boost_1_80_0/lib:$LD_LIBRARY_PATH
+    $ export CPATH=$HOME/myPackage/boost_1_80_0/include:$CPATH
+    $ export PATH=$HOME/myPackage/boost_1_80_0/bin:$PATH
+    $ source ~/.bashrc
+    $ ls $BOOST_ROOT/include/boost
+    $ ls $BOOST_ROOT/lib
+
+    ## Install gcc
+    ### gcc 11.5
+    $ cd ~
+    $ wget https://ftp.gnu.org/gnu/gcc/gcc-11.5.0/gcc-11.5.0.tar.gz
+    $ tar -xvzf gcc-11.5.0.tar.gz
+    $ cd gcc-11.5.0
+    $ ./contrib/download_prerequisites
+    $ mkdir build
+    $ cd build
+    $ mkdir ~/myPackage/gcc-11.5.0  => gcc 的安裝路徑
+    $ ../configure --prefix=$HOME/myPackage/gcc-1.5.0 --enable-languages=c,c++ --disable-multilib
+    $ make -j$(nproc)
+    $ make install
+    $ rm ~/gcc-11.5.0.tar.gz
+    $ rm -r ~/gcc-11.5.0
+    ### set environment variable (gcc)
+    $ vim ~/.bashrc
+    $ export PATH=$HOME/myPackage/gcc-11.5.0/bin:$PATH
+    $ export LD_LIBRARY_PATH=$HOME/myPackage/gcc-11.5.0/lib64:$LD_LIBRARY_PATH
+    $ export CC=$HOME/myPackage/gcc-11.5.0/bin/gcc
+    $ export CXX=$HOME/myPackage/gcc-11.5.0/bin/g++
+    $ source ~/.bashrc
+    $ gcc --version
+    $ g++ --version
+    ### set environment variable (cmake)
+    $ export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
+
+編譯方法
+    $ cmake . 
+    $ make 
+    ### 之後就會在bin生成D2D與D2D_Gui兩執行檔
+    
+使用流程:
+    接著根據下列使用方法執行
+
+    # D2D 使用方法
+    $ ./D2D design_file design_rule result_folder
+        使用後會根據設計規則與初始的bump位置, 生成繞線結果
+        為了方便觀察, 目前只會顯示三角規劃與padding bump
+        design_file: 初始Bumps的資料
+        design_rule: 設計規則
+        result_folder: 結果檔案夾
+
+        EX:
+        $ ./bin/D2D testcase/standard_44/bumps.loc testcase/standard_44/rule.txt ./result/
+
+    # D2D_Gui 使用方法
+    $ ./bin/D2D_Gui executable design_file design_rule result_folder
+        使用後會根據資料夾中有的檔案與規則生成GUI
+        executable: D2D執行檔
+        design_file: 初始Bumps的資料
+        design_rule: 設計規則
+        result_folder: 結果檔案夾
+
+        EX: 
+        $ ./bin/D2D_Gui ./bin/D2D ./testcase/standard_44/bumps.loc ./testcase/standard_44/rule.txt ./result/
+
+    D2D_Gui支援Reload/Rerun等機制, 可以讓使用者重新載入結果/重新對原設計進行繞等功能, 在顯示上以圖層方式顯示每一層的
+    設計結果, 會根據 設計規則 與 結果檔案 來畫出電路, 可以透過右半區的 勾選格 來顯示/關閉特定圖層, 右下角會顯示鼠標在
+    螢幕上的位置, 點擊右鍵第1次可以記錄數標位置, 第2次除了紀錄外也會顯示2次位置間的距離.
