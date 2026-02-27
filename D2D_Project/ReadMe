@@ -61,18 +61,27 @@
     接著根據下列使用方法執行
 
     # D2D 使用方法
-    $ ./D2D design_file design_rule result_folder
+    $ ./D2D design_file design_rule result_folder [-p population_size] [-g number_of_generations] [-c crossover_rate] [-m mutation_rate]  [-s seed]
         使用後會根據設計規則與初始的bump位置, 生成繞線結果
-        為了方便觀察, 目前只會顯示三角規劃與padding bump
+        
+        必要參數:
         design_file: 初始Bumps的資料
         design_rule: 設計規則
         result_folder: 結果檔案夾
+        選擇參數:
+            seed: 隨機種子碼 
 
+            全局繞線(採用基因演算法):
+                population_size: 族群大小
+                number_of_generations: 迭代次數
+                crossover_rate: 交配機率
+                mutation_rate: 變異機率
+                
         EX:
-        $ ./bin/D2D testcase/standard_44/bumps.loc testcase/standard_44/rule.txt ./result/
+        $ ./bin/D2D testcase/standard_44/bumps.loc testcase/standard_44/rule.txt ./result/ -p 300 -g 300 -c 0.9 -m 1  -s 51
 
     # D2D_Gui 使用方法
-    $ ./bin/D2D_Gui executable design_file design_rule result_folder
+    $ ./bin/D2D_Gui executable design_file design_rule result_folder 
         使用後會根據資料夾中有的檔案與規則生成GUI
         executable: D2D執行檔
         design_file: 初始Bumps的資料

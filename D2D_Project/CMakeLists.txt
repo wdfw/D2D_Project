@@ -88,4 +88,4 @@ target_link_libraries(D2D CGAL::CGAL Qt5::Widgets ) #1OpenMP::OpenMP_CXX
 # target_link_libraries(ShowResult CGAL::CGAL Qt5::Widgets) #2 
 # target_link_libraries(GenerateCase CGAL::CGAL Qt5::Widgets) #3
 
-# add_subdirectory("${CMAKE_SOURCE_DIR}/D2D_Gui")
+add_subdirectory("${CMAKE_SOURCE_DIR}/D2D_Gui")
