@@ -3,7 +3,7 @@
 class Verifier : public DetailedRoute {
 // protected:
 public:
-
+    
     bgsb::distance_symmetric<double> viaStrategy = bgsb::distance_symmetric<double>(0.0) ;
     bgsb::distance_symmetric<double> viaPadStrategy = bgsb::distance_symmetric<double>(0.0) ;
     bgsb::distance_symmetric<double> lineWidthStrategy = bgsb::distance_symmetric<double>(0.0) ;
@@ -12,7 +12,7 @@ public:
     bgsb::point_circle circleStrategy = bgsb::point_circle(0) ;
     bgsb::side_straight sideStrategy = bgsb::side_straight() ;
     DesignRule designRule ; 
-
+    
     void set_geometry_strategy(const DesignRule& designRule) ;
 
     // double viaRadius; // Bump不含Padding的半徑(不含黃色區塊)

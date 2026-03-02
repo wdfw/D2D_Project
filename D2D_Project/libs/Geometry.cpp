@@ -23,6 +23,7 @@ std::ostream& operator<<(std::ostream& os, const linestring_xy& linestring){
     for(int i=0; i<linestring.size(); ++i){
         os << linestring[i] << " " ;
     }
+    
     return os ; 
 }
 

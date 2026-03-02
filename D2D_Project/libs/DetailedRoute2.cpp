@@ -1,12 +1,13 @@
 #include "DetailedRoute.hpp"
 #define M_COST 1000000 
-#define DE2
+// #define DE2
 #ifdef DE2 
 
 int bufferInUpdate = 0 ;
 int bufferInSearch = 0 ;
 
 double angle(const PositionNodePtr& position, const PositionNodePtr& center){
+    
     double dx = position->x() - center->x() ; 
     double dy = position->y() - center->y() ; 
     return atan2(dy, dx) + M_PI ; // [0, 2*pi]
@@ -461,7 +462,7 @@ double DetailedRoute::detailed_route(RoutingInfo& routingInfo) {
     vector<ChannelDetailedNet> channelDetailedNets ;
     vector<DetailedNet> detailedNets, result ;
     Timer timer ; timer.set_clock() ; 
-
+    
     routingInfo.detailedNets.clear() ; 
     rtree.clear() ;  
     set_routing_geometry_strategy() ;
@@ -483,9 +484,10 @@ double DetailedRoute::detailed_route(RoutingInfo& routingInfo) {
             string color = net.startVia ? "#f60541" : "#06ea4e" ;
             Edge newEdge(segment_xy({node1->x(),node1->y()}, {node2->x(),node2->y()}), 2, color) ; 
             routingInfo.debugEdgeMapping["GREEDY_NET"].push_back(newEdge) ; 
+            
         }
     }
-
+    
     return 0.0 ;
 } 
 #endif

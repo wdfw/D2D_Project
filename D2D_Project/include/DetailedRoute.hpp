@@ -27,7 +27,7 @@ protected:
 
                 double caclute_connected_count(PositionNodePtr& prevNode, PositionNodePtr& currentNode, PositionNodePtr& nextNode, const DetailedNet& routedNet) ;
 
-        // void update_detailed_net(DetailedNet& detailedNet, DetailedNet& newDetailedNet) ;
+        void update_detailed_net(DetailedNet& detailedNet, DetailedNet& newDetailedNet) ;
     void ground_source_detailed_route(RoutingInfo& routingInfo, vector<DetailedNet>& routedDetailedNets,  vector<DetailedNet>& finalDetailedNet) ;
     void combine_detailed_nets(vector<DetailedNet>& detailedNets, vector<DetailedNet>& result) ; // 將相同BumpType & ID的線路組合起來
     void generate_design_net(vector<DetailedNet>& detailedNets, vector<Net>& designNets) ;

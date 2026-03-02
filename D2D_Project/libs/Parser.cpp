@@ -64,11 +64,10 @@ void parse_design_rule(const std::string &inputPath, DesignRule &designRule){
     if(!file.is_open()) throw std::runtime_error("[ParseDesignRule] Failed to open file: " + inputPath);
 
     std::string line, key;
-    
     for(int lineNumber=1; getline(file, line); ++lineNumber){
         if((line = strip(line)).empty()) continue ;
         std::istringstream iss(line);
-
+        
         if (!(iss >> key)) throw std::runtime_error("[ParseDesignRule] Error parsing in line #" + std::to_string(lineNumber)) ;
         if(key == "via_opening_diameter"){
             iss >> designRule.viaRadius ; designRule.viaRadius /= 2 ; 

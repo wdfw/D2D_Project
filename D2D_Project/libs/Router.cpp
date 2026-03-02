@@ -162,7 +162,7 @@ timer.set_clock() ;
             Bump& referenceBump = offsetVia.second ; 
             unroutedBumps.push_back(Bump(referenceBump.die, referenceBump.type, referenceBump.id, {referenceBump.x(), referenceBump.y()})) ; 
         }
-break;
+// break;
     }
 }
 

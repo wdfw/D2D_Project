@@ -20,6 +20,7 @@ std::clock_t Timer::get_duration_milliseconds() const {
 }
 
 std::string strip(const std::string& str){
+    
     int l=0, r=str.size(), f=0 ; 
     for(int i=0; i<str.size(); i++){
         if(isspace(str[i])){
@@ -31,6 +32,7 @@ std::string strip(const std::string& str){
             else r = i+1 ;
         }
     }
+    
     return str.substr(l, r-l) ;
 }
 

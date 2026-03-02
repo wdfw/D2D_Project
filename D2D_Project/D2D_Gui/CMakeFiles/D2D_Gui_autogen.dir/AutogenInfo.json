@@ -1,0 +1,184 @@
+{
+	"BUILD_DIR" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/D2D_Gui_autogen",
+	"CMAKE_BINARY_DIR" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui",
+	"CMAKE_EXECUTABLE" : "/home/wdfw/.local/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/CMakeLists.txt",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfigBuildVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_CreateSingleSourceCGALProgram.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_Macros.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_Common.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_Macros.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_TweakFindBoost.cmake",
+		"/home/wdfw/.local/share/cmake-3.24/Modules/GNUInstallDirs.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/D2D_Gui.hpp",
+			"MU",
+			"EWIEGA46WW/moc_D2D_Gui.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/D2D_Gui_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/D2D_Gui_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"CGAL_USE_GMPXX=1",
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NO_DEBUG",
+		"QT_WIDGETS_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/include",
+		"/usr/include/x86_64-linux-gnu/qt5",
+		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+		"/usr/include/x86_64-linux-gnu/qt5/QtGui",
+		"/usr/include/x86_64-linux-gnu/qt5/QtCore",
+		"/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
+		"/home/wdfw/myPackage/boost_1_80_0/include",
+		"/usr/include/x86_64-linux-gnu",
+		"/usr/include",
+		"/usr/include/c++/11",
+		"/usr/include/x86_64-linux-gnu/c++/11",
+		"/usr/include/c++/11/backward",
+		"/usr/lib/gcc/x86_64-linux-gnu/11/include",
+		"/usr/local/include"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/g++",
+		"-dM",
+		"-E",
+		"-c",
+		"/home/wdfw/.local/share/cmake-3.24/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/D2D_Gui_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 6,
+	"PARSE_CACHE_FILE" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/CMakeFiles/D2D_Gui_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/lib/qt5/bin/uic",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/CMakeFiles/D2D_Gui_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/D2D_Gui.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/D2D_Gui/Gui_main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/Configuration.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/DesignRule.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/DesignStructure.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/DetailedRoute.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/DetailedRoute2.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/Drawer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/FlowChecker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/Geometry.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/GlobalRoute.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/Parser.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/Router.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/Utils.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/wdfw/Master/CourseProject/D2D_Project/D2D_Project/libs/Verifier.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}

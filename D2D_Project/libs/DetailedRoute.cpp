@@ -1,7 +1,7 @@
 #include "DetailedRoute.hpp"
 #define M_COST 1000000 
 
-// #define DE
+#define DE
 #ifdef DE 
 int debugFlag = 0 ;
 
@@ -134,7 +134,7 @@ vector<double> elapsedTimes(10, 0.0) ;
 
 double DetailedRoute::A_star_cost(RoutingInfo& routingInfo, PositionNodePtr prevNode, PositionNodePtr currentNode, PositionNodePtr nextNode, BumpType netType, const DetailedNet& routedNet) {
     double wireLength = nextNode ? distance_sc(*currentNode, *nextNode) : 0 ;
-    double crossingCount = 0 ; // nextNode ? caclute_conflict_count(routingInfo.graph, currentNode, nextNode, netType, routedNet) : 0 ; 
+    double crossingCount = nextNode ? caclute_conflict_count(routingInfo.graph, currentNode, nextNode, netType, routedNet) : 0 ; 
     double anglePenalty = caclute_angle(routingInfo.graph, prevNode, currentNode, nextNode, routedNet) ; 
     double teardropExtensionPenalty = nextNode ? caclute_teardrop_extension_penalty(routingInfo.graph, currentNode, nextNode) : 0 ;
     double connectedCountPenalty = (caclute_connected_count(prevNode, currentNode, nextNode, routedNet)>=4) ? 1.0 : 0.0 ; 

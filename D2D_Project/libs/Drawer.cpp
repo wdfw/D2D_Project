@@ -103,6 +103,7 @@ void Drawer::draw_bump(const Bump &bump, vector<QGraphicsItem*>& itemBuffer){
             qred << QPointF(pt.x(), pt.y());
         }
         itemBuffer.push_back(scene->addPolygon(qred, innerPen, innerdBrush)) ;
+        
     }
     
     // 繪製 bump id 文字
@@ -114,6 +115,7 @@ void Drawer::draw_bump(const Bump &bump, vector<QGraphicsItem*>& itemBuffer){
         textItem->setPos(bump.x() - 5, bump.y() - 5);  // bump 位置
         scene->addItem(textItem);  // 直接加進 scene，不加進 group
         itemBuffer.push_back(textItem) ;
+        
     }
 }
 void Drawer::draw_offset_via(const OffsetVia &offsetVia, vector<QGraphicsItem*>& itemBuffer){
@@ -134,7 +136,7 @@ void Drawer::draw_offset_via(const OffsetVia &offsetVia, vector<QGraphicsItem*>&
     boost::geometry::union_(buffer1, buffer2, merged_area);
     boost::geometry::convex_hull(merged_area, convex_hull);
     boost::geometry::buffer(convex_hull, final_outer_buffer, viaPadStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
-
+    
     for (const auto &poly : final_outer_buffer) {
         QPolygonF qpoly;
         for (const auto &pt : poly.outer()) {
@@ -148,10 +150,10 @@ void Drawer::draw_offset_via(const OffsetVia &offsetVia, vector<QGraphicsItem*>&
 } 
 
 void Drawer::draw_net(const Net& net, vector<QGraphicsItem*>& itemBuffer){
+    
     Qt::GlobalColor netColor = NetColor[net.type] ; 
     QBrush brush(netColor);
     QPen pen(netColor); pen.setWidth(1);
-
     for(auto& segment : net){
         linestring_xy line ;
         multi_polygon_xy buffer ;
@@ -171,11 +173,10 @@ void Drawer::draw_net(const Net& net, vector<QGraphicsItem*>& itemBuffer){
 
 void Drawer::draw_violations( const vector<Bump>& bumps, const vector<Net>& nets, vector<QGraphicsItem*>& itemBuffer) {
     // Net : vector<segment_xy>
-    
     vector<vector<multi_polygon_xy>> lineDetectionRegionBuffers(nets.size()) ;
     vector<vector<multi_polygon_xy>> lineWidthBuffers(nets.size()) ;
     vector<multi_polygon_xy> viaPadDetectionRegionBuffers(bumps.size()) ;
-
+    
     for(int i=0; i<bumps.size(); ++i){
         boost::geometry::buffer(point_xy(bumps[i]), viaPadDetectionRegionBuffers[i], DRC_ViaPadSapcingStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
     }
@@ -192,9 +193,10 @@ void Drawer::draw_violations( const vector<Bump>& bumps, const vector<Net>& nets
             boost::geometry::buffer(line, buffer2, DRC_LineWidthStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy) ;
             lineDetectionRegionBuffers[i].push_back(buffer1) ; 
             lineWidthBuffers[i].push_back(buffer2) ; 
+            
         }
     }
-
+    
     for(int i=0; i<bumps.size(); ++i){
         if(bumps[i].type==DUMMY) continue;
 

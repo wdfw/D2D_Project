@@ -87,7 +87,7 @@ protected:
             double caclute_wire_length(const Chromosome& chromosome) ;
             int caclute_conflict_count(const Chromosome& chromosome) ; 
             int caclute_excessive_capacity(const Chromosome& chromosome) ; 
-
+        
         void genetic_algorithm_process(const Channel& channel, const Chromosome& referencedChromosome,  Chromosome& bestChromosome) ;
             void initialize_population(const Channel& channel, const Chromosome& referencedChromosome, vector<ChromosomePtr>& population) ;
             void select_parents(const vector<ChromosomePtr>& population, vector<ChromosomePtr>& parents) ;

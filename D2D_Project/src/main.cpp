@@ -19,11 +19,11 @@ int main(int argc, char *argv[]) {
     }
 
     string designBumpPath = argv[1] ; 
+    
     string designRulePath = argv[2] ;
     string outputDirectories = argv[3] ;
     box_xy chipBoundary ;
     vector<Bump> designBumps ; 
-    
     DesignRule desigRule ; 
     int seed = 42 ; 
     for(int i=4; i<argc; ++i){
@@ -42,10 +42,8 @@ int main(int argc, char *argv[]) {
     parse_design_rule(designRulePath, desigRule) ;
     
     Verifier router ; 
-
+    
     router.solve(designBumps, desigRule, GlobalGAConfig, chipBoundary, outputDirectories) ;
-
-
 
     return 0 ; 
 }

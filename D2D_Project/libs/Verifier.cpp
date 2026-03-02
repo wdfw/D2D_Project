@@ -8,7 +8,7 @@ void Verifier::set_geometry_strategy(const DesignRule& designRule) {
     const double via_buffer_distance = designRule.viaPadRadius - designRule.viaRadius  ; 
     const double track_buffer_distance = designRule.minimumLineWidth / 2 + designRule.minimumLineSpacing ;
     const int points_per_circle = 36;
-
+    
     viaStrategy = bgsb::distance_symmetric<double>(via_radius_distance);
     viaPadStrategy = bgsb::distance_symmetric<double>(via_buffer_distance);
 
@@ -17,6 +17,7 @@ void Verifier::set_geometry_strategy(const DesignRule& designRule) {
     endStrategy = bgsb::end_round(points_per_circle);
     circleStrategy = bgsb::point_circle(points_per_circle);
     sideStrategy = bgsb::side_straight();
+    
 }
 
 
@@ -25,7 +26,7 @@ bool Verifier::check_line_to_line_spacing(RoutingInfo& routingInfo) {
     vector<DetailedNet>& detailedNets = routingInfo.detailedNets  ; 
     vector<vector<pair<PositionNodePtr, PositionNodePtr>>> segments(detailedNets.size()) ;
     vector<vector<multi_polygon_xy>> segmentBuffers(detailedNets.size()) ;
-
+    
     for(int i=0; i<detailedNets.size(); ++i){
         auto& detailedNet = detailedNets[i] ; 
 
