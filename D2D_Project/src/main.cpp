@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
     }
 
     string designBumpPath = argv[1] ; 
-    
     string designRulePath = argv[2] ;
     string outputDirectories = argv[3] ;
     box_xy chipBoundary ;
@@ -44,7 +43,7 @@ int main(int argc, char *argv[]) {
     Verifier router ; 
     
     router.solve(designBumps, desigRule, GlobalGAConfig, chipBoundary, outputDirectories) ;
-
+    
     return 0 ; 
 }
 

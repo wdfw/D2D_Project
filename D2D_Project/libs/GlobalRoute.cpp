@@ -43,21 +43,17 @@ bool ChannelCode::operator>(const ChannelCode& code2) const {
     int polarity = 0 ; // 0無向性, 1表示code1比code2上方, -1表示code1比code2下方
     int code1Bit = 0, code2Bit = 0; 
     for(int k=s; k<t; ++k){
-        if(k>=code1.startIndex && k>=code2.startIndex && k<code1.endIndex && k<code2.endIndex){
-            code1Bit = code1[k-code1.startIndex] ; code2Bit = code2[k-code2.startIndex] ; 
-        }else{
-            if(k==code1.startIndex-1 && k>=code2.startIndex){
-                code1Bit = code1[0]/2 ; code2Bit = code2[k-code2.startIndex] ; 
-            }else if(k>=code1.startIndex && k==code2.startIndex-1){
-                code1Bit = code1[k-code1.startIndex] ; code2Bit = code2[0]/2 ;
-            }
+        if(k>=code1.startIndex && k<code1.endIndex-1) code1Bit = code1[k-code1.startIndex] ;
+        else if(k==code1.startIndex-1) code1Bit = code1[0]/2 ;
+        else if(k==code1.endIndex-1) code1Bit = code1.back()/2 ;
+        else code1Bit = 0 ;
 
-            if(k==code1.endIndex && k<code2.endIndex){
-                code1Bit = code1.back()/2 ; code2Bit = code2[k-code2.startIndex] ; 
-            }else if(k<code1.endIndex && k==code2.endIndex){
-                code1Bit = code1[k-code1.startIndex] ; code2Bit = code2.back()/2 ;
-            }
-        }
+        if(k>=code2.startIndex && k<code2.endIndex-1) code2Bit = code2[k-code2.startIndex] ;
+        else if(k==code2.startIndex-1) code2Bit = code2[0]/2 ;
+        else if(k==code2.endIndex-1) code2Bit = code2.back()/2 ;
+        else code2Bit = 0 ;
+
+        if(!code1Bit || !code2Bit) continue ;
 
         if(code1Bit>code2Bit){
             if(polarity==-1) ++ conflictCount ;
@@ -129,7 +125,7 @@ void ChannelRepresentation::randomize_code() {
 }
 
 void ChannelRepresentation::legalize_code() {
-    code.back() = code[code.size()-2] ; 
+    // code.back() = code[code.size()-2] ; 
 }
 
 void GlobalRoute::construct_routing_channel(RoutingInfo& routingInfo, Channel& channel) {
@@ -233,9 +229,9 @@ void GlobalRoute::generate_refenced_chromosome(RoutingInfo& routingInfo, Channel
             for(int j=0, codeIndex=0; j<channelTileMatrix[i].size() && isAtUpperChannel!=2; ++j){
                 auto& tile = channelTileMatrix[i][j] ; 
                 if(isAtUpperChannel==-1 || isAtUpperChannel==1){
-                    if(via1->id==54){
-                        cout << *via2 << " | " << *tile << " | " << codeIndex << "\n" ;
-                    }
+                    // if(via1->id==54){
+                    //     cout << *via2 << " | " << *tile << " | " << codeIndex << "\n" ;
+                    // }
                     if(graph.tileSurroundVias.at(tile).contains(via1)){
                         if(isAtUpperChannel==-1){
                             newChannelRepresentation.path.channelRow = i ;
@@ -292,6 +288,35 @@ void GlobalRoute::update_and_legalize(const Channel& channel, vector<ChromosomeP
             representation.legalize_code() ;
             representation.synchronize_path(channel) ;
         }
+    }
+}
+
+void GlobalRoute::population_analisis(const vector<ChromosomePtr>& population) {
+    Chromosome averageChromosome = *population[0] ;
+    vector<vector<double>> averageCode(population[0]->size()) ;
+    for(int i=0; i<population[0]->size(); ++i){
+        averageCode[i] = vector<double>(population[0]->at(i).code.size(), 0.0) ; 
+    }
+
+    for(auto& chromosomePtr : population){
+        for(int i=0; i<chromosomePtr->size(); ++i){
+            for(int j=0; j<chromosomePtr->at(i).code.size(); ++j){
+                averageCode[i][j] += chromosomePtr->at(i).code[j] ; 
+            }
+        }
+    }
+    
+    for(int i=0; i<averageCode.size(); ++i){
+        for(int j=0; j<averageCode[i].size(); ++j){
+            averageCode[i][j] /= population.size() ; 
+        }
+    }
+
+    for(int i=0; i<population[0]->size(); ++i){
+        cout << "Start: " << *population[0]->at(i).startVia << "| Target: " << *population[0]->at(i).targetVia << "\n" ;
+        cout << "AVG Code: " ;
+        for(auto& v : averageCode[i]) cout << v << " " ;
+        cout << "\n" ;
     }
 }
 
@@ -404,10 +429,78 @@ int GlobalRoute::caclute_conflict_count(const Chromosome& chromosome){
     return conflictCount ; 
 }
 
+bool show_flag = false ;
+int GlobalRoute::caclute_conflict_count2(const Chromosome& chromosome){
+    int conflictCount = 0 ;
+    for(int i=0; i<chromosome.size(); ++i){
+        for(int j=i+1; j<chromosome.size(); ++j){
+            if(chromosome[i].path.channelRow!=chromosome[j].path.channelRow) continue ; 
+            const ChannelCode& code1 = chromosome[i].code ;
+            const ChannelCode& code2 = chromosome[j].code ;
+            if(code1.endIndex<code2.startIndex || code2.endIndex<code1.startIndex) continue ;
+
+            int s = min(code1.startIndex, code2.startIndex) ;
+            int t = max(code1.endIndex, code2.endIndex) ;
+            
+            int polarity = 0 ; // 0無向性, 1表示code1比code2上方, -1表示code1比code2下方
+            int code1Bit = 0, code2Bit = 0; 
+            bool cmpFlag ; 
+
+            // if(i==0 && j==6){
+            //     cout << s << " " << t << "\n" ;
+            // }
+
+            for(int k=s; k<t; ++k){
+                if(k>=code1.startIndex && k<code1.endIndex-1) code1Bit = code1[k-code1.startIndex] ;
+                else if(k==code1.startIndex-1) code1Bit = code1[0]/2 ;
+                else if(k==code1.endIndex-1) code1Bit = code1.back()/2 ;
+                else code1Bit = 0 ;
+
+                if(k>=code2.startIndex && k<code2.endIndex-1) code2Bit = code2[k-code2.startIndex] ;
+                else if(k==code2.startIndex-1) code2Bit = code2[0]/2 ;
+                else if(k==code2.endIndex-1) code2Bit = code2.back()/2 ;
+                else code2Bit = 0 ;
+
+                if(!code1Bit || !code2Bit){
+// if(i==0 && j==6 && show_flag){
+// cout << code1.startIndex << " " << code1.endIndex << "|" << code2.startIndex << " " << code2.endIndex << "|" << k << " " << code1Bit << " " << code2Bit << " " << polarity << "\n" ;
+// }
+                    continue ; 
+                }
+                if(code1Bit>code2Bit){
+                    if(polarity==-1){
+                         ++ conflictCount ;
+                        //  if( show_flag) cout << *chromosome[i].startVia << " " << *chromosome[j].startVia  << "\n" ;
+                    }
+                     polarity = 1 ;
+                }else if(code1Bit<code2Bit){
+                    if(polarity==1){
+                        ++ conflictCount ;
+                        // if( show_flag) cout << *chromosome[i].startVia << " " << *chromosome[j].startVia << "\n" ;
+                    }
+                    polarity = -1 ;
+                }else if(code1Bit==code2Bit){
+                    polarity = polarity ;
+                }
+// if(i==0 && j==6 && show_flag){
+// cout << code1.startIndex << " " << code1.endIndex << "|" << code2.startIndex << " " << code2.endIndex << "|" << k << " " << code1Bit << " " << code2Bit << " " << polarity << "\n" ;
+// }
+            }
+
+            // if(i==0 && j==6){
+            //     cout << *chromosome[i].startVia << " " << code1 << "\n" ;
+            //     cout << *chromosome[j].startVia << " " << code2 << "\n" ;
+            // }
+
+        }
+    }
+    return conflictCount ; 
+}
+
 double GlobalRoute::caclute_cost(const Channel& channel, Chromosome& chromosome, CostStruct& costResult) {
     costResult.wireLength = caclute_wire_length(chromosome) ;
     costResult.excessiveCapacity = caclute_excessive_capacity(chromosome) ;
-    costResult.conflictCount = caclute_conflict_count(chromosome) ; 
+    costResult.conflictCount = caclute_conflict_count2(chromosome) ; 
     costResult.differentialLength = 0 ;
 
     chromosome.fitness = GAConfig.alpha*costResult.wireLength + GAConfig.beta*costResult.excessiveCapacity + GAConfig.gamma*costResult.conflictCount + GAConfig.delta*costResult.differentialLength ;
@@ -429,32 +522,32 @@ void GlobalRoute::select_parents(const vector<ChromosomePtr>& population, vector
         [](const ChromosomePtr& c1, const ChromosomePtr& c2){return c1->fitness<c2->fitness;}
     ) ; 
     
-    vector<double> roll(candidates.size(), 0) ; for(int i=0; i<candidates.size(); ++i) roll[i] = 0.01 * (1.1-(i*(0.2049)/(101))) ; 
-    double rr = 0.0 ; for(auto& r : roll) rr += r ; 
+    // vector<double> roll(candidates.size(), 0) ; for(int i=0; i<candidates.size(); ++i) roll[i] = 0.01 * (1.1-(i*(0.2049)/(101))) ; 
+    // double rr = 0.0 ; for(auto& r : roll) rr += r ; 
 
-    for(int i=0; i<GAConfig.populationSize*2; ++i){
-        bool f = false ; 
-        double p = rand()%10000000/double(10000000)* rr ; 
-        for(int j=0; j<roll.size(); ++j){
-            p -= roll[j] ;
-            if(p<=0){
-                parents.push_back(candidates[j]) ; 
-                f = 1 ; 
-                break;
-            }
-        }
-        if(!f) parents.push_back(candidates.back()) ; 
-    }
-
-    // for(int i=0; parents.size()<GAConfig.populationSize*2; ++i){
-    //     candidates.clear() ; 
-    //     for(int j=0; j<GAConfig.tournamentSize; j++){
-    //         candidates.push_back(population[ GlobalRandomTool.rand(0, population.size()-1) ]) ; 
+    // for(int i=0; i<GAConfig.populationSize*2; ++i){
+    //     bool f = false ; 
+    //     double p = GlobalRandomTool.rand(0, 10000000)/double(10000000)* rr ; 
+    //     for(int j=0; j<roll.size(); ++j){
+    //         p -= roll[j] ;
+    //         if(p<=0){
+    //             parents.push_back(candidates[j]) ; 
+    //             f = 1 ; 
+    //             break;
+    //         }
     //     }
-
-    //     ChromosomePtr& winner = *min_element(candidates.begin(), candidates.end(), [](ChromosomePtr& p1, ChromosomePtr& p2){return p1->fitness < p2->fitness;}) ; 
-    //     parents.push_back(winner) ; 
+    //     if(!f) parents.push_back(candidates.back()) ; 
     // }
+
+    for(int i=0; parents.size()<GAConfig.populationSize*2; ++i){
+        candidates.clear() ; 
+        for(int j=0; j<GAConfig.tournamentSize; j++){
+            candidates.push_back(population[ GlobalRandomTool.rand(0, population.size()-1) ]) ; 
+        }
+
+        ChromosomePtr& winner = *min_element(candidates.begin(), candidates.end(), [](ChromosomePtr& p1, ChromosomePtr& p2){return p1->fitness < p2->fitness;}) ; 
+        parents.push_back(winner) ; 
+    }
 }
 
 void GlobalRoute::crossover(const vector<ChromosomePtr>& parents, vector<ChromosomePtr>& offsprings) {
@@ -469,10 +562,9 @@ void GlobalRoute::crossover(const vector<ChromosomePtr>& parents, vector<Chromos
  
         for(int j=0; j<offspring1->size(); ++j){
             if( GlobalRandomTool.Bernoulli_trial(GAConfig.crossoverRate) ){
-                // int p1 = GlobalRandomTool.rand(0, offspring1->at(j).code.size()) ; p2 = GlobalRandomTool.rand(0, offspring1->at(j).code.size()) ;
-                // if(p1 > p2) swap(p1, p2) ;
-                // for(int k=p1; k<p2; k++) swap(offspring1->at(j).code[k], offspring2->at(j).code[k]) ;
-                swap(offspring1->at(j), offspring2->at(j)) ;
+                int p1 = GlobalRandomTool.rand(0, offspring1->at(j).code.size()) ; p2 = GlobalRandomTool.rand(0, offspring1->at(j).code.size()) ;
+                if(p1 > p2) swap(p1, p2) ;
+                for(int k=p1; k<p2; k++) swap(offspring1->at(j).code[k], offspring2->at(j).code[k]) ;
             }
         }
 
@@ -559,52 +651,53 @@ pair<double, double> GlobalRoute::statistically_evaluate(const Channel& channel,
     return {avgCost, stdCost} ; 
 }
 
-void GlobalRoute::genetic_algorithm_process(const Channel& channel, const Chromosome& referencedChromosome, Chromosome& bestChromosome) {
+void GlobalRoute::genetic_algorithm_process(const Channel& channel, const Chromosome& referencedChromosome, Chromosome& bestChromosome, CostStruct& cost) {
 
     vector<ChromosomePtr> population, parents, offsprings, survivors ;
     CostStruct costResult, bestCostResult ;
     double bestCost ; 
-    cout << "----------Genetic Algorithm Start----------\n" ;
+    // cout << "----------Genetic Algorithm Start----------\n" ;
+    // cout << "GA: Step A\n" ;
     initialize_population(channel, referencedChromosome, population) ; 
 
-    cout << "GA: Step A\n" ;
-
+    // cout << "GA: Step B\n" ;
     update_and_legalize(channel, population) ;
-    cout << "GA: Step B\n" ;
     evaluate(channel, population) ;
 
-    cout << "GA: Step C\n" ;
+    // cout << "GA: Step C\n" ;
     for(int i=1; i<=GAConfig.generations; ++i){
         select_parents(population, parents) ; 
+
+        // if(i%50==0){
+        //     cout << "----------Parent " << i << "----------\n" ;
+        //     CostStruct avgCostResult, stdCostResult ;
+        //     pair<double, double> costSTAs = statistically_evaluate(channel, parents, avgCostResult, stdCostResult) ; 
+            
+        //     cout << "AVE: " << avgCostResult << "| AVE Cost: " << costSTAs.first << "\n" ;
+        //     cout << "STD: " << stdCostResult << "| STD Cost: " << costSTAs.second << "\n" ;
+        //     cout << "------------------------------------------\n\n" ;
+        // }
         crossover(parents, offsprings) ; 
         mutation(offsprings) ; 
         update_and_legalize(channel, offsprings) ;
         evaluate(channel, offsprings) ;
         select_surviors(population, offsprings, survivors) ; 
+
         population = survivors ;
 
-        if(i%50==0){
-            cout << "----------Iteration " << i << "----------\n" ;
-            CostStruct avgCostResult, stdCostResult ;
-            pair<double, double> costSTAs = statistically_evaluate(channel, population, avgCostResult, stdCostResult) ; 
-            
-            cout << "AVE: " << avgCostResult << "| AVE Cost: " << costSTAs.first << "\n" ;
-            cout << "STD: " << stdCostResult << "| STD Cost: " << costSTAs.second << "\n" ;
-            cout << "------------------------------------------\n" ;
-        }
     }
 
     bestChromosome = **min_element(population.begin(), population.end(), [](ChromosomePtr& p1, ChromosomePtr& p2){return p1->fitness < p2->fitness;}) ; 
-
     bestCost = caclute_cost(channel, bestChromosome, bestCostResult) ; 
+    cost = bestCostResult ; 
 
-    cout << "Best Result:\n" ;
+    // cout << "Best Result:\n" ;
     // cout << "Chromosome: " << bestChromosome << "\n" ;
     // cout << "Cost Structure: " << bestCostResult << "\n" ;
-    cout << "Cost: " << bestCost << "\n" ;
-    cout << "Wire Length: " << bestCostResult.wireLength << "\n" ; 
-    cout << "Excessive Capacity: " << bestCostResult.excessiveCapacity << "\n" ;
-    cout << "Conflict Count: " << bestCostResult.conflictCount << "\n" ;
+    // cout << "Cost: " << bestCost << "\n" ;
+    // cout << "Wire Length: " << bestCostResult.wireLength << "\n" ; 
+    // cout << "Excessive Capacity: " << bestCostResult.excessiveCapacity << "\n" ;
+    // cout << "Conflict Count: " << bestCostResult.conflictCount << "\n" ;
 
 }
 
@@ -652,14 +745,20 @@ void GlobalRoute::generate_global_nets(const RoutingInfo& routingInfo, const Chr
 }
 double GlobalRoute::global_route(RoutingInfo& routingInfo, CostStruct& costResult) {
     Timer timer; timer.set_clock() ;
-
+    CostStruct cost ;
     Channel channel ; 
     Chromosome referencedChromosome, bestChromosome ;
     vector<ChannelGlobalNet> globalNets ; 
     construct_routing_channel(routingInfo, channel) ;
     connect_routing_channel(routingInfo, channel) ;
     generate_refenced_chromosome(routingInfo, channel, referencedChromosome) ; 
-    genetic_algorithm_process(channel, referencedChromosome, bestChromosome) ; 
+
+    for(int testing_times=0; ;++testing_times){
+        genetic_algorithm_process(channel, referencedChromosome, bestChromosome, cost) ; 
+        if(cost.conflictCount==0 && cost.excessiveCapacity==0) break ;
+        else if(testing_times>=10) throw runtime_error("Global Route Fail.") ; 
+    }
+    
     sort_routing_order(bestChromosome) ; 
     add_shielding(bestChromosome) ;
     generate_global_nets(routingInfo, bestChromosome, routingInfo.globalNets) ;

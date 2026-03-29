@@ -20,8 +20,6 @@ void Verifier::set_geometry_strategy(const DesignRule& designRule) {
     
 }
 
-
-
 bool Verifier::check_line_to_line_spacing(RoutingInfo& routingInfo) {
     vector<DetailedNet>& detailedNets = routingInfo.detailedNets  ; 
     vector<vector<pair<PositionNodePtr, PositionNodePtr>>> segments(detailedNets.size()) ;

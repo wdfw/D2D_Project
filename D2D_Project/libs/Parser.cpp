@@ -227,8 +227,6 @@ void parse_teardrop(const std::string &inputPath, std::vector<Teardrop>& teardro
         std::istringstream iss(line);
         if (!(iss >> die >> type >> id >> x1 >> y1 >> x2 >> y2 )) throw std::runtime_error("[ParseTeardrop] Error parsing in line #" + std::to_string(lineNumber)) ;
         teardrops.push_back(Teardrop(str_to_die_type(die), str_to_bump_type(type), id, {{x1, y1}, {x2, y2}})) ;
-
-        
     }
 }
 

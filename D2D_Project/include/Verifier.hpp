@@ -1,6 +1,6 @@
 #include "DetailedRoute.hpp"
 
-class Verifier : public DetailedRoute {
+class Verifier : public DetailedRoute3 {
 // protected:
 public:
     
@@ -32,7 +32,7 @@ public:
     // write_result(directory, "Layer", "bump", routingInfo.routingBumps) ;
     // write_result(directory, "Layer", "offset_via", routingInfo.offsetVias) ;
     // write_result(directory, "Layer", "net", routingInfo.designNets) ;
-    using DetailedRoute::DetailedRoute ; 
+    using DetailedRoute3::DetailedRoute3 ; 
 
     double design_rule_check(RoutingInfo& routingInfo) override ;
 

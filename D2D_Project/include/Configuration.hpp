@@ -17,7 +17,7 @@ std::ostream& operator<<(std::ostream& os, const SAConfiguration& config) ;
 extern GAConfiguration GlobalGAConfig ; 
 extern SAConfiguration GloablSAConfig ; 
 
-
+extern double GlobalExpansionRation ;
 extern double GlobalResolution ;
 extern double GlobalEpsilonX ;
 extern double GlobalEpsilonY ;

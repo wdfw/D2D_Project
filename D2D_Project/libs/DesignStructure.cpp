@@ -185,4 +185,14 @@ std::string to_formatted_string(const Net& net) {
 
     return str ; 
 }
-// std::string to_formatted_string(const Teardrop& teardrop) ; 
+
+std::string to_formatted_string(const Teardrop& teardrop) {
+    
+    std::string str = to_formatted_string(teardrop.die) + " " + to_formatted_string(teardrop.type) + " " + 
+                        std::to_string(teardrop.id) + " " +
+                        std::to_string(teardrop.first.x()) + " " +
+                        std::to_string(teardrop.first.y()) + " " +
+                        std::to_string(teardrop.second.x()) + " " +
+                        std::to_string(teardrop.second.y()) ;
+    return str ; 
+}

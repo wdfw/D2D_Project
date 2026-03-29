@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(D2D_Project)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 # 1) 確保 bin 資料夾存在
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
@@ -24,7 +24,7 @@ add_custom_target(show
 )
 
 add_custom_target(exe
-  COMMAND   ./bin/D2D testcase/standard_44/bumps.loc testcase/standard_44/rule.txt ./result -p 300 -g 300 -m 1 -c 0.9 -s 51
+  COMMAND   ./bin/D2D testcase/standard_44/bumps.loc testcase/standard_44/rule.txt ./result -p 300 -g 100 -m 0.1 -c 0.9 -s 112
 )
 
 add_custom_target(exe2

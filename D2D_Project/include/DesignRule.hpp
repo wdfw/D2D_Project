@@ -16,4 +16,4 @@ struct DesignRule {
     double minimumLineSpacing;  // 線與線之間的距離
     double minimumLineViaPadSpacing; // 線與Bump之間的距離(含黃色)
     double minimumTeardropDist; // teardrop 外面的點, 到 teardrop 圓心的距離
-};
+}; 

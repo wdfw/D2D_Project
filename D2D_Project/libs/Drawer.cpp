@@ -38,6 +38,77 @@ void Drawer::set_design_scence(QGraphicsScene *scene){
     this->scene = scene ; 
 }
 
+
+void Drawer::draw_teardrop(const Teardrop& teardrop, vector<QGraphicsItem*>& itemBuffer) {
+    multi_polygon_xy circle_poly, final_outer_buffer;
+    point_xy startPoint(teardrop.first.x(), teardrop.first.y()) ;
+    point_xy targetPoint(teardrop.second.x(), teardrop.second.y()) ;
+
+    boost::geometry::buffer(startPoint, circle_poly, viaStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+    boost::geometry::buffer(circle_poly, final_outer_buffer, viaPadStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+
+
+    double x1 = startPoint.x() ; 
+    double y1 = startPoint.y() ; 
+    double x2 = targetPoint.x() ; 
+    double y2 = targetPoint.y() ; 
+
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+    double d  = std::sqrt(dx*dx + dy*dy);
+
+    // 圓心->外部點的角度
+    double theta = std::atan2(dy, dx);
+    // 切線與圓心連線的夾角
+    double alpha = std::acos(teadropRadius / d);
+
+    // 兩條切線與圓心連線的角度
+    double theta1 = theta + alpha;
+    double theta2 = theta - alpha;
+
+    // 對應切點的座標
+    double tx1_1 = x1 + teadropRadius * std::cos(theta1);
+    double ty1_1 = y1 + teadropRadius * std::sin(theta1);
+
+    double tx1_2 = x1 + teadropRadius * std::cos(theta2);
+    double ty1_2 = y1 + teadropRadius * std::sin(theta2);
+
+    // 建立 Boost.Geometry point
+    point_xy T1(tx1_1, ty1_1);
+    point_xy T2(tx1_2, ty1_2);
+
+    // ----------------------------------------------------
+    // 4. 生成「尾巴」(三角形) 並和「圓形」做 union
+    // ----------------------------------------------------
+    polygon_xy tail_poly;
+    tail_poly.outer().push_back(T1);
+    tail_poly.outer().push_back(targetPoint);
+    tail_poly.outer().push_back(T2);
+    tail_poly.outer().push_back(T1); // 關閉多邊形
+
+    multi_polygon_xy merged_area;
+    bg::union_(final_outer_buffer, tail_poly, merged_area);
+
+    // (1) 用 Boost.Geometry 計算「圓之外 (尾巴部分)」
+    multi_polygon_xy tail_portion; 
+    bg::difference(merged_area, final_outer_buffer, tail_portion);
+
+    QBrush tailBrush(Qt::yellow);      // 其餘部分(尾巴)用藍色
+    QPen   tailPen(Qt::yellow);
+    tailPen.setWidth(1);
+
+    // (4) 繪製「尾巴區域」(tail_portion)
+    for (auto const &poly : tail_portion){
+        QPolygonF qpoly;
+        for (auto const &pt : poly.outer()){
+            qpoly << QPointF(bg::get<0>(pt), bg::get<1>(pt));
+        }
+        itemBuffer.push_back(scene->addPolygon(qpoly, tailPen, tailBrush)) ;
+    }
+}
+
+
+
 void Drawer::draw_label(const Label& label, vector<QGraphicsItem*>& itemBuffer){
     QString QLabelStr = QString::fromStdString(label.labelStr) ; 
     QGraphicsSimpleTextItem* textItem = new QGraphicsSimpleTextItem(QLabelStr);

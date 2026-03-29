@@ -13,6 +13,39 @@ Net DetailedNet::to_design_net() {
     }
     return designNet ; 
 }
+       
+void DetailedNet::add_connection(PositionNodePtr& p1, PositionNodePtr& p2) {
+    (*this)[p1].insert(p2) ; 
+    (*this)[p2].insert(p1) ; 
+}
+
+
+
+void DetailedNet::to_segements(vector<pair<PositionNodePtr, PositionNodePtr>>& segements) {
+    segements.clear() ; 
+    for(auto& [node1, connectedNodes] : *this){
+        for(auto& node2 : connectedNodes){
+            if(node1>=node2) continue ;
+            segements.push_back({node1, node2}) ;
+        }
+    }
+}
+
+void DetailedNet::get_end_points(vector<PositionNodePtr>& endPoints) {
+    endPoints.clear() ; 
+    map<PositionNodePtr, int> accessCount ; 
+    for(auto& [node1, connectedNodes] : *this){
+        for(auto& node2 : connectedNodes){
+            ++accessCount[node2] ;
+            ++accessCount[node1] ;
+        }
+    }
+
+    for(auto& [node, count] : accessCount){
+        if(count%2) throw logic_error("Odd Count in get_end_points\n") ;
+        if(count==2) endPoints.push_back(node) ; 
+    }
+}
 
 void DetailedNet::combine(DetailedNet& newDetailedNet) {
   for(auto& [node1, connectedNodes] : newDetailedNet){
@@ -129,40 +162,42 @@ void Router::solve(const vector<Bump>& bumps, const DesignRule& designRule, cons
 
         routingInfo.chipBoundary = layerBoundary ; routingInfo.bumpDistance = bumpDistance ;
 
-timer.set_clock() ;
+        timer.set_clock() ;
 
-        select_routing_bump(unroutedBumps, routingInfo, 8) ;
+        select_routing_bump(unroutedBumps, routingInfo, 9) ;
         adjust_offset_vias(routingInfo, layer-1) ;
         add_dummy_bumps(routingInfo) ;
-
         rouding_bumps(routingInfo) ;
-
         step1_check(routingInfo) ; 
 
         construct_routing_graph(routingInfo) ; 
         step2_check(routingInfo) ; 
-
         global_route(routingInfo, costStruct) ;
         // step3_check(routingInfo) ; 
 
         detailed_route(routingInfo) ; 
-
         // design_rule_check(routingInfo) ; 
         // cout << routingInfo.debugEdgeMapping["ERROR_NET"].size() << "\n" ;
 
         renew_routing_bumps(routingInfo) ;
 
+
+// class Teardrop : public DBI_Key, public segment_xy {
+// public:
+// Teardrop(DieType die, BumpType type, int id, const segment_xy& segment = {{0, 0}, {0, 0}})  
+// : DBI_Key(die, type, id), segment_xy(segment) {}
+// } ;
+
         cout << "Elapsed Time: " << timer.get_duration_milliseconds() << " ms\n"  ;
 
         generate_routing_result(routingInfo, outputDirectory + "/RDL_" + to_string(layer)) ;
+        
         unroutedBumps.clear() ; 
-        // ./bin/D2D testcase/standard_44/bumps.loc testcase/standard_44/rule.txt ./result -p 1 -g 0 -m 1 -c 0.9 -s 51
 
         for(auto& offsetVia: routingInfo.offsetVias){
             Bump& referenceBump = offsetVia.second ; 
             unroutedBumps.push_back(Bump(referenceBump.die, referenceBump.type, referenceBump.id, {referenceBump.x(), referenceBump.y()})) ; 
         }
-// break;
     }
 }
 
@@ -186,7 +221,8 @@ void Router::select_routing_bump(const vector<Bump>& bumps, RoutingInfo& routing
     sort(signalBumpIndexes.begin(), signalBumpIndexes.end(), [&bumps](int i, int j) { return bumps[i].x()>bumps[j].x();} ) ; // Die1中越靠近右方的Signal bumps越先選
     for(int i=0; i<min(selecNumber, (unsigned int)(signalBumpIndexes.size())); ++i) selectedID.insert(bumps[signalBumpIndexes[i]].id) ;
 
-// selectedID = set<int>{36, 40, 37, 41, 38, 42, 39, 43} ; 
+    
+// selectedID = set<int>{36, 40, 37, 41, 38, 34, 39, 43, 42} ; 
 // selectedID = set<int>{54} ; 
 
     for(int i=0; i<bumps.size(); i++){
@@ -514,6 +550,24 @@ void star_create_tiles_DFS(RoutingGraph& graph, vector<vector<ViaNodePtr>>& resu
         results.insert(results.end(), subResult.begin(), subResult.end()) ; 
     }
 #endif
+
+}
+
+
+void star_create_tiles_BFS(RoutingGraph& graph, vector<vector<ViaNodePtr>>& results, int k){
+    if(k<3) throw logic_error("K less than 3 can't form a hull.") ;
+    bgi::rtree<point_xy, bgi::quadratic<500>> rtree ; // 驗證convex hull中是否有其他via
+    for(auto &viaNodePtr : graph.vias) rtree.insert(point_xy(*viaNodePtr)) ; 
+
+    vector<ViaNodePtr> buffer ; 
+    flat_map<ViaNodePtr, bool> passed ; 
+    for(auto via : graph.vias) rtree.insert(point_xy(*via)) ;
+    for(auto via : graph.vias) passed[via] = false ; 
+
+    results.clear() ; 
+    for(auto via : graph.vias){
+        create_tiles_DFS(graph, results, buffer, passed, rtree, via, via, k) ; 
+    }
 
 }
 
@@ -987,6 +1041,8 @@ void Router::generate_routing_result(const RoutingInfo& routingInfo, const strin
     write_result(directory, "Layer", "bump", routingInfo.routingBumps) ;
     write_result(directory, "Layer", "offset_via", routingInfo.offsetVias) ;
     write_result(directory, "Layer", "net", routingInfo.designNets) ;
+
+    write_result(directory, "Layer", "teardrop", routingInfo.teardrops) ;
 
     // for(auto& edge : routingInfo.graph.positions) outputFile << to_formatted_string(static_cast<Bump&>(*edge)) << "\n" ;
 

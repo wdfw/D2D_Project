@@ -5,7 +5,8 @@
 GAConfiguration GlobalGAConfig ; 
 SAConfiguration GloablSAConfig ; 
 
-double GlobalResolution  = 100000 ;
+double GlobalExpansionRation = 1.2 ;
+double GlobalResolution = 100000 ;
 double GlobalEpsilonX = 1e-3 ;
 double GlobalEpsilonY = 1e-3 ;
 double GlobalEpsilonR = sqrt(pow(GlobalEpsilonX,2) + pow(GlobalEpsilonY,2)) ;

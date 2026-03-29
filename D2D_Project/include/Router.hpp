@@ -143,3 +143,64 @@ public:
                 const box_xy& boundary, const string& outputDirectory) ;
 } ;
 
+class D2DRouter {
+protected:
+    DesignRule designRule ; 
+    box_xy boundary ;
+    vector<clock_t> routingTimes ;
+    string outputDirectory ;
+    GAConfiguration GAConfig ;
+
+    using ConnectionMap = map<Bump, set<Bump>> ; 
+
+
+
+    void initialize_routing_information(RoutingInfo& routingInfo) ;
+    void select_routing_bump(const vector<Bump>& bumps, RoutingInfo& routingInfo, unsigned int selecNumber = numeric_limits<int>::max()) ; 
+    void adjust_offset_vias(RoutingInfo& routingInfo, int layer) ; 
+    void add_dummy_bumps(RoutingInfo& routingInfo) ; 
+    void rouding_bumps(RoutingInfo& routingInfo) ;
+
+    void step1_check(const RoutingInfo& routingInfo) const ; // 驗證routing bumps與offset via為空集合 以及offset via的合法性
+
+    void construct_routing_graph(RoutingInfo& routingInfo) ; 
+        void triangulation(const RoutingInfo& routingInfo, const vector<Bump>& bumps, ConnectionMap& connections) ;
+        void combine_connections(const ConnectionMap& connections1, const ConnectionMap& connections2, ConnectionMap& combinedConnections) ; 
+        void create_node_and_edges(const ConnectionMap& combinedConnections, RoutingInfo& routingInfo, int k) ; 
+            void create_viaMatrix(RoutingInfo& routingInfo) ;
+
+            void create_vias_and_v2v_edges(const ConnectionMap& combinedConnections, RoutingInfo& routingInfo) ; 
+            void create_edges_and_via_crossing(RoutingInfo& routingInfo) ; 
+            void create_positions_and_viaExtendedPositions_and_edgeExtendedPositions(RoutingInfo& routingInfo) ; 
+            void create_tiles_and_tile_surround_vias(RoutingInfo& routingInfo, int k) ;
+
+            void create_e2e_edges(RoutingInfo& routingInfo) ; 
+            void create_p2p_edges(RoutingInfo& routingInfo) ; 
+            void create_tiles(RoutingInfo& routingInfo) ; 
+            void create_t2t_edges_and_tile_crossing_edges(RoutingInfo& routingInfo) ; 
+            void create_tileSurroundVias(RoutingInfo& routingInfo) ; 
+            void create_tileSurroundEdges_and_tileSurroundPositions(RoutingInfo& routingInfo) ; 
+        void set_capacity(RoutingInfo& routingInfo) ; // 設定每一邊的預估容量
+        void set_edge_type(RoutingInfo& routingInfo) ; // 設定edge node的種類
+
+    void step2_check(const RoutingInfo& routingInfo) const ; // 驗證繞線圖的合法性
+
+    virtual double global_route(RoutingInfo& routingInfo, CostStruct& costStruct) = 0 ; 
+    void step3_check(const RoutingInfo& routingInfo) const ; // 驗證繞線圖的合法性
+
+    
+    virtual double detailed_route(RoutingInfo& routingInfo) = 0 ; 
+    void step4_check(const RoutingInfo& routingInfo) const ; // 驗證繞線圖的合法性
+    
+    virtual double design_rule_check(RoutingInfo& routingInfo) = 0 ;
+
+    void renew_routing_bumps(RoutingInfo& routingInfo) ; // 修正原本被當作Offset Via但被成功繞出的點
+
+    void generate_routing_result(const RoutingInfo& routingInfo, const string& directory) ; 
+
+public:
+    void solve(const vector<Bump>& bumps, const DesignRule& designRule,  const GAConfiguration& GAConfig,
+                const box_xy& boundary, const string& outputDirectory) ;
+} ;
+class GlobalRouter ;
+class DetailedRouter ;

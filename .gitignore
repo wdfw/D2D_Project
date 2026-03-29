@@ -10,5 +10,7 @@ D2D_Project/Makefile
 
 D2D_Project/D2D_Gui/icons
 D2D_Project/D2D_Gui/resources
+D2D_Project/D2D_Gui/CMakeFiles
+D2D_Project/D2D_Gui/Makefile
 
 .vscode

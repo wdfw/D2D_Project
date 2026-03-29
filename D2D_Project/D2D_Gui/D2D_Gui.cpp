@@ -227,6 +227,7 @@ void D2DGui::reloadLayoutResult(const string& resultDirectory, const string& des
     vector<Bump> bumps ; 
     vector<OffsetVia> offsetVias ; 
     vector<Net> nets ; 
+    vector<Teardrop> teardrops ; 
     
     for(int i=0; i<RDLDirectories.size(); i++){
         
@@ -274,10 +275,11 @@ void D2DGui::reloadLayoutResult(const string& resultDirectory, const string& des
                         for(auto& offsetVia : offsetVias) drawer.draw_offset_via(offsetVia, graphicsItemControlTable[group] ) ; 
                     }else if(extension==".net"){
                         parse_net(filePath, nets) ;
-                        
                         for(auto& net : nets) drawer.draw_net(net, graphicsItemControlTable[group]) ; 
-
                     }else if(extension==".teardrop"){
+                        parse_teardrop(filePath, teardrops) ;
+                        for(auto& teardrop : teardrops) drawer.draw_teardrop(teardrop, graphicsItemControlTable[group]) ; 
+
                     }
             
                 }

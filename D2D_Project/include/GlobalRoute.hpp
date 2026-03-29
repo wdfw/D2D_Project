@@ -85,10 +85,13 @@ protected:
 
         double caclute_cost(const Channel& channel, Chromosome& chromosome, CostStruct& costResult) ; 
             double caclute_wire_length(const Chromosome& chromosome) ;
-            int caclute_conflict_count(const Chromosome& chromosome) ; 
+            int caclute_conflict_count(const Chromosome& chromosome) ;
+            int caclute_conflict_count2(const Chromosome& chromosome) ; 
+
             int caclute_excessive_capacity(const Chromosome& chromosome) ; 
-        
-        void genetic_algorithm_process(const Channel& channel, const Chromosome& referencedChromosome,  Chromosome& bestChromosome) ;
+
+        void genetic_algorithm_process(const Channel& channel, const Chromosome& referencedChromosome, Chromosome& bestChromosome, CostStruct& cost) ;
+            void population_analisis(const vector<ChromosomePtr>& population) ;
             void initialize_population(const Channel& channel, const Chromosome& referencedChromosome, vector<ChromosomePtr>& population) ;
             void select_parents(const vector<ChromosomePtr>& population, vector<ChromosomePtr>& parents) ;
             void crossover(const vector<ChromosomePtr>& parents, vector<ChromosomePtr>& offsprings) ;

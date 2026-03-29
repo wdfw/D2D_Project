@@ -3,14 +3,11 @@
 #include <cmath>
 #include <memory>
 #include <limits>
+#include "DataStructure.hpp"
 
 namespace bg = boost::geometry;
 namespace bgsb = bg::strategy::buffer ;
 namespace bgi = boost::geometry::index;
-
-// using bg::distance ; 
-// using bg::crosses ; 
-// using bg::read_wkt ;
 
 using point_xy = bg::model::d2::point_xy<double> ; 
 using box_xy = bg::model::box<point_xy> ;
@@ -21,12 +18,6 @@ using multi_polygon_xy = boost::geometry::model::multi_polygon<polygon_xy>;
 using linestring_xy = bg::model::linestring<point_xy> ;
 using multi_linestring_xy = bg::model::multi_linestring<linestring_xy> ;
 
-template <typename T> class routing_shared_ptr ;
-// point_xy& operator+(const point_xy& p1, const& point_xy p2) ;
-// point_xy& operator-(const point_xy& p1, const& point_xy p2) ;
-// point_xy& operator*(const point_xy& p1, double m) ;
-// point_xy& operator/(const point_xy& p1, double d) ;
-
 std::ostream& operator<<(std::ostream& os, const point_xy& point) ;
 std::ostream& operator<<(std::ostream& os, const box_xy& box) ;
 std::ostream& operator<<(std::ostream& os, const segment_xy& segment) ;
@@ -34,25 +25,13 @@ std::ostream& operator<<(std::ostream& os, const polygon_xy& polygon) ;
 std::ostream& operator<<(std::ostream& os, const multi_point_xy& multi_point) ;
 std::ostream& operator<<(std::ostream& os, const linestring_xy& linestring) ;
 
-template <typename T1, typename T2>
-double distance_sc(const T1& p1, const T2& p2) { return bg::distance(static_cast<const point_xy&>(p1), static_cast<const point_xy&>(p2));}
+template <typename T1, typename T2> double distance_sc(const T1& p1, const T2& p2) ;
+template <typename T1, typename T2> double angle_sc(const T1& p1, const T2& p2) ;
+template <typename T1, typename T2, typename T3, typename T4> double is_crossed_sc(const T1& p11, const T2& p12, const T3& p21, const T4& p22) ;
 
-template <typename T1, typename T2, typename T3, typename T4>
-double is_crossed_sc(const T1& p11, const T2& p12, const T3& p21, const T4& p22) { 
-    segment_xy seg1(static_cast<const point_xy&>(p11), static_cast<const point_xy&>(p12)) ;
-    segment_xy seg2(static_cast<const point_xy&>(p21), static_cast<const point_xy&>(p22)) ;
-    return bg::intersects(seg1, seg2);
-}
-
-
-template <typename T>
-const T& unwrap(const T& v) { return v; }
-
-template <typename T>
-const T& unwrap(const std::shared_ptr<T>& v) { return *v; }
-
-template <typename T>
-const T& unwrap(const routing_shared_ptr<T>& v) { return *v; }
+template <typename T> const T& unwrap(const T& v) ;
+template <typename T> const T& unwrap(const std::shared_ptr<T>& v) ;
+template <typename T> const T& unwrap(const flat_shared_ptr<T>& v) ;
 
 template<typename T> // 把元素根據y軸進行分列
 void find_elements_in_each_row(const std::vector<T>& elements, std::vector<std::vector<T>>& rowElements, double epsilonY = 1e-6) ;
@@ -69,13 +48,38 @@ void matrixlize(const std::vector<T>& elements, std::vector<std::vector<T>>& mat
 template <typename T> // 把元素根據segements的區段分列並再以x軸排序
 double minimum_distance_between_elements(const std::vector<T>& elements) ;
 
+template <typename T1, typename T2>
+double distance_sc(const T1& p1, const T2& p2) { return bg::distance(static_cast<const point_xy&>(p1), static_cast<const point_xy&>(p2));}
+
+template <typename T1, typename T2>
+double angle_sc(const T1& p1, const T2& p2) {
+    double dx = unwrap(p1).x() - unwrap(p2).x() ;   
+    double dy = unwrap(p1).y() - unwrap(p2).y() ;   
+    return atan2(dy, dx) + M_PI ; // [0, 2*pi]
+}
+
+template <typename T1, typename T2, typename T3, typename T4>
+double is_crossed_sc(const T1& p11, const T2& p12, const T3& p21, const T4& p22) { 
+    segment_xy seg1(static_cast<const point_xy&>(p11), static_cast<const point_xy&>(p12)) ;
+    segment_xy seg2(static_cast<const point_xy&>(p21), static_cast<const point_xy&>(p22)) ;
+    return bg::intersects(seg1, seg2);
+}
+
+template <typename T>
+const T& unwrap(const T& v) { return v; }
+
+template <typename T>
+const T& unwrap(const std::shared_ptr<T>& v) { return *v; }
+
+template <typename T>
+const T& unwrap(const flat_shared_ptr<T>& v) { return *v; }
+
 template<typename T> 
 void find_elements_in_each_row(const std::vector<T>& elements, std::vector<std::vector<T>>& rowElements, double epsilonY){ 
     std::vector<T> sortedElements = elements ; sort(sortedElements.begin(), sortedElements.end(), 
         [](const T& a, const T& b) {return unwrap(a).y() < unwrap(b).y();});
     
     rowElements.clear() ; 
-
     for (const auto& element : sortedElements) {
         if(!rowElements.size()) rowElements.push_back({element}) ;
         else if(fabs(unwrap(rowElements.back().back()).y() - unwrap(element).y()) >= epsilonY) rowElements.push_back({element}) ;
@@ -146,17 +150,3 @@ double minimum_distance_between_elements(const std::vector<T>& elements) {
     return minimumDistance ;
 }
 
-template <typename T> 
-class routing_shared_ptr : public std::shared_ptr<T> {
-public:
-    using std::shared_ptr<T>::shared_ptr;
-    routing_shared_ptr(std::shared_ptr<T>&& other) : std::shared_ptr<T>(std::move(other)) {}
-    routing_shared_ptr(const std::shared_ptr<T>& other) : std::shared_ptr<T>(other) {}
-
-    bool operator<(const routing_shared_ptr& ptr) const { return **this < *ptr ; }
-    bool operator>(const routing_shared_ptr& ptr) const { return **this > *ptr ; }
-    bool operator>=(const routing_shared_ptr& ptr) const { return **this >= *ptr ; }
-    bool operator<=(const routing_shared_ptr& ptr) const { return **this <= *ptr ; }
-    bool operator==(const routing_shared_ptr& ptr) const { return **this == *ptr ; }
-    bool operator!=(const routing_shared_ptr& ptr) const { return **this != *ptr ; }
-};

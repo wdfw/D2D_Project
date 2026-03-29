@@ -12,6 +12,7 @@ enum BumpType {
     SIGNAL, // 信號點
     VDD, // 電源點
     VSS, // 接地點
+    MIXED // 組合用
 } ;
 
 enum DieType {

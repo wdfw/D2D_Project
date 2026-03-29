@@ -56,6 +56,7 @@ public:
     void draw_bump(const Bump& bump, vector<QGraphicsItem*>& itemBuffer) ;
     void draw_offset_via(const OffsetVia& offsetVia, vector<QGraphicsItem*>& itemBuffer) ; 
     void draw_net(const Net& net, vector<QGraphicsItem*>& itemBuffer) ; 
+    void draw_teardrop(const Teardrop& teardrop, vector<QGraphicsItem*>& itemBuffer) ; 
     
     void draw_violations(const vector<Bump>& bumps, const vector<Net>& nets, vector<QGraphicsItem*>& itemBuffer) ;
 
