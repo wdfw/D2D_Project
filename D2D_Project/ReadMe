@@ -94,3 +94,19 @@
     D2D_Gui支援Reload/Rerun等機制, 可以讓使用者重新載入結果/重新對原設計進行繞等功能, 在顯示上以圖層方式顯示每一層的
     設計結果, 會根據 設計規則 與 結果檔案 來畫出電路, 可以透過右半區的 勾選格 來顯示/關閉特定圖層, 右下角會顯示鼠標在
     螢幕上的位置, 點擊右鍵第1次可以記錄數標位置, 第2次除了紀錄外也會顯示2次位置間的距離.
+
+繞線結果:
+    紅點/線是信號
+    綠點/線是VSS
+    藍點/線是VDD
+
+Layer1:
+    ![image](https://github.com/wdfw/D2D_Project/tree/main/D2D_Project/images/layer1.png)
+Layer2:
+    ![image](https://github.com/wdfw/D2D_Project/tree/main/D2D_Project/images/layer2.png)
+Layer3:
+    ![image](https://github.com/wdfw/D2D_Project/tree/main/D2D_Project/images/layer3.png)
+Layer4:
+    ![image](https://github.com/wdfw/D2D_Project/tree/main/D2D_Project/images/layer4.png)
+Layer5:
+    ![image](https://github.com/wdfw/D2D_Project/tree/main/D2D_Project/images/layer5.png)
