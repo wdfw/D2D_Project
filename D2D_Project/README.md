@@ -32,7 +32,7 @@ ls $BOOST_ROOT/lib
 ```bash
 cmake .
 make
-# Generate executables, D2D and D2D_Gui, in ./bin
+# Executables 'D2D' and 'D2D_Gui' will be generated in the ./bin directory.
 ```
 ## Usage 
 
@@ -42,44 +42,44 @@ Generates routing results based on design rules and initial bump positions.
 ./D2D design_file design_rule result_folder [-p population_size] [-g number_of_generations] [-c crossover_rate] [-m mutation_rate]  [-s seed]
 ```
 **Required Parameters:**
-- `design_file`: Data for initial bump locations.
+- `design_file`: Input file containing initial bump locations.
 - `design_rule`: Design rules and constraints.
-- `result_folder`: Target folder for output results.
+- `result_folder`: Target directory for output files.
 
 **Optional Parameters:**
-- `seed`: Random seed for reproducibility.
+- `seed`: Random seed.
 
 **Global Routing (Genetic Algorithm Settings):**
 - `population_size`: Number of individuals in the population.
 - `number_of_generations`: Total number of iterations.
-- `crossover_rate`: Probability of crossover.
-- `mutation_rate`: Probability of mutation.
+- `crossover_rate`: Probability of crossover (0.0 - 1.0).
+- `mutation_rate`: Probability of mutation (0.0 - 1.0).
         
-EX:
+Example:
 ```bash
 ./bin/D2D testcase/standard_44/bumps.loc testcase/standard_44/rule.txt ./result -p 300 -g 100 -m 0.1 -c 0.9 -s 100
 ```
 
 ### D2D_Gui 
-D2D_Gui will show the results based on design rules and results from D2D.
+Provides a graphical interface to visualize the routing results based on design rule and result from D2D.
 ```bash
 ./D2D_Gui executable design_file design_rule result_folder 
 ```
 **Required Parameters:**
-- `executable`: Data for initial bump locations.
-- `design_file`: Design file contains initial bump positions.
+- `executable`: Path to the D2D executable.
+- `design_file`: Input file containing initial bump locations.
 - `design_rule`: Design rules and constraints.
-- `result_folder`: Result folder of the design file.
+- `result_folder`: Directory containing the D2D routing results.
 
-EX:
+Example:
 ```bash
 ./bin/D2D_Gui ./bin/D2D ./testcase/standard_44/bumps.loc ./testcase/standard_44/rule.txt ./result/
 ```
 
 ## Routing Result on Standard Case
-- 🔴 **Red bump/net for signal**
-- 🟢 **Green bump/net for VSS (ground)**
-- 🔵 **Blue bump/net for VDD (source)**
+- 🔴 **Red: Signal bump/net**
+- 🟢 **Green: VSS (Ground) bump/net**
+- 🔵 **Blue:  VDD (Source) bump/net**
 #### Layer1
 ![image](images/layer1.png)
 #### Layer2
