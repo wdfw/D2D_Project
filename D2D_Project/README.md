@@ -78,7 +78,7 @@ EX:
 
 ## Routing Result on Standard Case
 - 🔴 **Red bump/net for signal**
-- 🟢 **Greenbump/net for VSS (ground)**
+- 🟢 **Green bump/net for VSS (ground)**
 - 🔵 **Blue bump/net for VDD (source)**
 #### Layer1
 ![image](images/layer1.png)
