@@ -30,7 +30,7 @@ ls $BOOST_ROOT/lib
 
 ## Compile
 ```bash
-cd D2D_Project
+cmake .
 make
 # Generate executables, D2D and D2D_Gui, in ./bin
 ```
