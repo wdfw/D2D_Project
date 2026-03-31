@@ -1,5 +1,13 @@
 #include "RoutingStructure.hpp"
 
+int ViaNode::_k_id = 0 ;
+int TileNode::_k_id = 0 ;
+int EdgeNode::_k_id = 0 ;
+int PositionNode::_k_id = 0 ;
+// int ViaToViaEdge::_k_id = 0 ; 
+// int TileToTileEdge::_k_id = 0 ; 
+// int EdgeToEdgeEdge::_k_id = 0 ; 
+// int PositionToPositionEdge::_k_id = 0 ; 
 
 bool PositionNode::is_compitable(BumpType& netType){
 

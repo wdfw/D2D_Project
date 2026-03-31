@@ -217,7 +217,7 @@ void D2DGui::reloadLayoutResult(const string& resultDirectory, const string& des
 
     string filePath, bumpFilePath, netFilePath ; 
     DesignRule designRule ; parse_design_rule(designRulePath, designRule) ;
-    Drawer drawer ; drawer.set_design_rule(designRule) ; 
+    Drawer drawer ; drawer.set_strategy(designRule) ; 
 
 
     box_xy boundary ; 

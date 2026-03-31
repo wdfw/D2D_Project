@@ -75,7 +75,6 @@ protected:
     DesignRule designRule ; 
     box_xy boundary ;
     vector<clock_t> routingTimes ;
-    string outputDirectory ;
     GAConfiguration GAConfig ;
 
     using ConnectionMap = map<Bump, set<Bump>> ; 
@@ -85,13 +84,6 @@ protected:
         routingInfo.debugPointMapping.clear() ; 
         routingInfo.debugEdgeMapping.clear() ; 
         routingInfo.debugBumpMapping.clear() ;
-    }
-    void wait_until_input(const RoutingInfo& routingInfo){
-        #ifdef DEBUGGER
-            generate_routing_result(routingInfo, outputDirectory) ;
-            string foo ; 
-            cin >> foo ;
-        #endif
     }
 
 
@@ -134,7 +126,7 @@ protected:
     
     virtual double design_rule_check(RoutingInfo& routingInfo) = 0 ;
 
-    void renew_routing_bumps(RoutingInfo& routingInfo) ; // 修正原本被當作Offset Via但被成功繞出的點
+    void renew_routing_bumps(RoutingInfo& routingInfo, vector<Bump>& unroutedBumps) ; // 修正原本被當作Offset Via但被成功繞出的點
 
     void generate_routing_result(const RoutingInfo& routingInfo, const string& directory) ; 
 

@@ -8,30 +8,35 @@ map<BumpType, Qt::GlobalColor> SpacingColor = {{DUMMY, Qt::darkGray}, {SIGNAL, Q
 //-------------------------------------------------------------------------------------
 
 Drawer::Drawer(const DesignRule& designRule, QGraphicsScene *scene){
-    set_design_rule(designRule) ;
+    set_strategy(designRule) ;
     set_design_scence(scene) ;
 }
 
-void Drawer::set_design_rule(const DesignRule& designRule){
+void Drawer::set_strategy(const DesignRule& designRule){
     this->designRule = designRule ;
+    UI_designRule = designRule ;
+    UI_designRule.viaRadius += QT_DRAWER_OFFSET ;
+    UI_designRule.viaPadRadius += QT_DRAWER_OFFSET ;
+    UI_designRule.minimumLineWidth += 2*QT_DRAWER_OFFSET ;
+    UI_strategies.set_strategy(UI_designRule) ; 
 
-    // 設定緩衝區策略
-    const int points_per_circle = 36;
+    DRC_Detection_designRule = designRule ;
+    DRC_Detection_designRule.viaPadRadius = DRC_Detection_designRule.minimumLineViaPadSpacing + QT_DRAWER_OFFSET ;
+    DRC_Detection_designRule.minimumLineWidth = DRC_Detection_designRule.minimumLineSpacing + 2*QT_DRAWER_OFFSET ;
+    DRC_Detection_strategies.set_strategy(DRC_Detection_designRule) ; 
 
-    viaStrategy = bgsb::distance_symmetric<double>(designRule.viaRadius + QT_DRAWER_OFFSET);
-    viaPadStrategy = bgsb::distance_symmetric<double>(designRule.viaPadRadius - designRule.viaRadius) ;
-    lineWidthStrategy = bgsb::distance_symmetric<double>(designRule.minimumLineWidth/2 + QT_DRAWER_OFFSET);
+    DRC_designRule = designRule ;
+    DRC_strategies.set_strategy(DRC_designRule) ; 
 
-    DRC_LineWidthStrategy = bgsb::distance_symmetric<double>(designRule.minimumLineWidth/2 );
+    DRC_LineWidthStrategy = bgsb::distance_symmetric<double>(designRule.minimumLineWidth/2);
     DRC_LineSapcingStrategy = bgsb::distance_symmetric<double>(designRule.minimumLineWidth/2 + designRule.minimumLineSpacing) ; 
     DRC_ViaPadSapcingStrategy = bgsb::distance_symmetric<double>(designRule.viaPadRadius + designRule.minimumLineViaPadSpacing) ; 
 
-    joinStrategy = bgsb::join_round(points_per_circle);
-    endStrategy = bgsb::end_round(points_per_circle);
-    circleStrategy = bgsb::point_circle(points_per_circle);
-    sideStrategy = bgsb::side_straight();
 
-    teadropRadius = designRule.viaPadRadius ;
+    joinStrategy = UI_strategies.joinStrategy ; 
+    endStrategy = UI_strategies.endStrategy ; 
+    circleStrategy = UI_strategies.circleStrategy ; 
+    sideStrategy = UI_strategies.sideStrategy ; 
 }
 
 void Drawer::set_design_scence(QGraphicsScene *scene){
@@ -43,11 +48,10 @@ void Drawer::draw_teardrop(const Teardrop& teardrop, vector<QGraphicsItem*>& ite
     multi_polygon_xy circle_poly, final_outer_buffer;
     point_xy startPoint(teardrop.first.x(), teardrop.first.y()) ;
     point_xy targetPoint(teardrop.second.x(), teardrop.second.y()) ;
+    UI_strategies.buffer_via(startPoint, circle_poly) ;
+    UI_strategies.buffer_viapad(startPoint, final_outer_buffer) ;
 
-    boost::geometry::buffer(startPoint, circle_poly, viaStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
-    boost::geometry::buffer(circle_poly, final_outer_buffer, viaPadStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
-
-
+    double teadropRadius = designRule.viaPadRadius ;
     double x1 = startPoint.x() ; 
     double y1 = startPoint.y() ; 
     double x2 = targetPoint.x() ; 
@@ -157,8 +161,10 @@ void Drawer::draw_bump(const Bump &bump, vector<QGraphicsItem*>& itemBuffer){
     QBrush innerdBrush(bumpColor);
     QPen innerPen(bumpColor); innerPen.setWidth(1);
 
-    boost::geometry::buffer(pt, buffer, viaStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
-    boost::geometry::buffer(buffer, final_outer_buffer, viaPadStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+    // viaStrategy = bgsb::distance_symmetric<double>(designRule.viaRadius + QT_DRAWER_OFFSET);
+    // viaPadStrategy = bgsb::distance_symmetric<double>(designRule.viaPadRadius - designRule.viaRadius) ;
+    UI_strategies.buffer_via(pt, buffer) ;
+    UI_strategies.buffer_viapad(pt, final_outer_buffer) ;
 
     for (const auto &poly : final_outer_buffer) {
         QPolygonF qpoly;
@@ -202,11 +208,11 @@ void Drawer::draw_offset_via(const OffsetVia &offsetVia, vector<QGraphicsItem*>&
     QBrush outerYellowBrush(Qt::yellow);
     QPen outerYellowPen(Qt::yellow);  outerYellowPen.setWidth(1);
 
-    boost::geometry::buffer(center1, buffer1, viaStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
-    boost::geometry::buffer(center2, buffer2, viaStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+    UI_strategies.buffer_viapad(center1, buffer1) ;
+    UI_strategies.buffer_viapad(center2, buffer2) ;
     boost::geometry::union_(buffer1, buffer2, merged_area);
-    boost::geometry::convex_hull(merged_area, convex_hull);
-    boost::geometry::buffer(convex_hull, final_outer_buffer, viaPadStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+    boost::geometry::convex_hull(merged_area, final_outer_buffer);
+    // boost::geometry::buffer(convex_hull, final_outer_buffer, viaPadStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
     
     for (const auto &poly : final_outer_buffer) {
         QPolygonF qpoly;
@@ -230,7 +236,8 @@ void Drawer::draw_net(const Net& net, vector<QGraphicsItem*>& itemBuffer){
         multi_polygon_xy buffer ;
         bg::append(line, point_xy(segment.first.x() , segment.first.y())) ;
         bg::append(line, point_xy(segment.second.x() , segment.second.y())) ;
-        boost::geometry::buffer(line, buffer, lineWidthStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy) ;
+
+        UI_strategies.buffer_line(line, buffer) ;
         for (auto &poly : buffer) {
             QPolygonF qpoly;
             for (auto &pt : poly.outer()) {

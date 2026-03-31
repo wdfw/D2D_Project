@@ -35,3 +35,25 @@ std::ostream& operator<<(std::ostream& os, const DesignRule& rule) {
 
     return os ; 
 }
+
+void GeometricStrategy::set_strategy(const DesignRule& design_rule) {
+    const int points_per_circle = 36 ;  
+    viaStrategy = bgsb::distance_symmetric<double>(design_rule.viaRadius) ; 
+    viaPadStrategy = bgsb::distance_symmetric<double>(design_rule.viaPadRadius) ;
+    lineWidthStrategy = bgsb::distance_symmetric<double>(design_rule.minimumLineWidth/2) ; 
+    joinStrategy = bgsb::join_round(points_per_circle) ; 
+    endStrategy = bgsb::end_round(points_per_circle) ;
+    sideStrategy = bgsb::side_straight() ; 
+    circleStrategy = bgsb::point_circle() ; 
+} ;
+
+void GeometricStrategy::buffer_via(const point_xy& pt, multi_polygon_xy& poly) const {
+    boost::geometry::buffer(pt, poly, viaStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+}
+
+void GeometricStrategy::buffer_viapad(const point_xy& pt, multi_polygon_xy& poly) const {
+    boost::geometry::buffer(pt, poly, viaPadStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+}
+void GeometricStrategy::buffer_line(const linestring_xy& line, multi_polygon_xy& poly) const {
+    boost::geometry::buffer(line, poly, lineWidthStrategy, sideStrategy, joinStrategy, endStrategy, circleStrategy);
+}

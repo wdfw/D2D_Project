@@ -68,23 +68,31 @@ public:
 } ; 
 
 class ViaNode : public RoutingNode {
+private:
+    static int _k_id ; 
 public:
-    ViaNode(DieType die, BumpType type, int id, int k_id = -1, const point_xy& point = {0,0}) : RoutingNode(die, type, id, k_id, point) {}
+    ViaNode(DieType die, BumpType type, int id, const point_xy& point = {0,0}) : RoutingNode(die, type, id, _k_id++, point) {}
 };
 
 class TileNode : public RoutingNode {
+private:
+    static int _k_id ; 
 public:
-    TileNode(DieType die, BumpType type, int id, int k_id = -1, const point_xy& point = {0,0}) : RoutingNode(die, type, id, k_id, point) {}
+    TileNode(DieType die, BumpType type, int id, const point_xy& point = {0,0}) : RoutingNode(die, type, id, _k_id++, point) {}
 };
 
 class EdgeNode : public RoutingNode {
+private:
+    static int _k_id ; 
 public:
     EdgeType edgeType ; 
-    EdgeNode(DieType die, BumpType type, int id, int k_id = -1, const point_xy& point = {0,0}, EdgeType edgetype = BaseEdge) 
-        : RoutingNode(die, type, id, k_id, point), edgeType(edgeType) {}
+    EdgeNode(DieType die, BumpType type, int id, const point_xy& point = {0,0}, EdgeType edgetype = BaseEdge) 
+        : RoutingNode(die, type, id, _k_id++, point), edgeType(edgeType) {}
 };
 
 class PositionNode : public RoutingNode { // 跟隨EdgeNode的資訊, 每個EdgeNode可以生成與其 容量 相同的PositionNodes, 每個PositionNodes只能被一種線路佔據
+private:
+    static int _k_id ; 
 public:
     BumpType occupyType = DUMMY ; // 佔據的線路
     int occupyCount = 0 ; // 佔據的線段數 

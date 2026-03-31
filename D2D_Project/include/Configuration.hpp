@@ -17,8 +17,9 @@ std::ostream& operator<<(std::ostream& os, const SAConfiguration& config) ;
 extern GAConfiguration GlobalGAConfig ; 
 extern SAConfiguration GloablSAConfig ; 
 
-extern double GlobalExpansionRation ;
-extern double GlobalResolution ;
+extern double GlobalExpansionRation ; // Buffer額外膨脹的係數(防止與DRC的偵測區塊過近)
+extern double GlobalCapacityReservationRatio ; // Global Route中Capacity減少的比例 (預估上下走線造成的額外所需空間)
+extern double GlobalResolution ; 
 extern double GlobalEpsilonX ;
 extern double GlobalEpsilonY ;
 extern double GlobalEpsilonR ;

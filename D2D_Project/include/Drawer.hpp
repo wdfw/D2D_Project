@@ -29,6 +29,7 @@ using namespace std ;
 
 class Drawer {
 private:
+
     bgsb::distance_symmetric<double> viaStrategy = bgsb::distance_symmetric<double>(0.0) ; // for UI
     bgsb::distance_symmetric<double> viaPadStrategy = bgsb::distance_symmetric<double>(0.0) ; // for UI
     bgsb::distance_symmetric<double> lineWidthStrategy = bgsb::distance_symmetric<double>(0.0) ; // for UI
@@ -36,7 +37,14 @@ private:
     bgsb::end_round endStrategy = bgsb::end_round(0) ; // for UI
     bgsb::point_circle circleStrategy = bgsb::point_circle(0) ; // for UI
     bgsb::side_straight sideStrategy = bgsb::side_straight() ; // for UI
-    double teadropRadius = 0.0 ; // for UI
+    
+    GeometricStrategy UI_strategies ; // 顯示用
+    GeometricStrategy DRC_Detection_strategies ; // 偵測框顯示用
+    GeometricStrategy DRC_strategies ; // DRC驗證用
+
+    DesignRule UI_designRule ;
+    DesignRule DRC_Detection_designRule ;
+    DesignRule DRC_designRule ;
 
     bgsb::distance_symmetric<double> DRC_LineSapcingStrategy = bgsb::distance_symmetric<double>(0.0) ; // for DRC
     bgsb::distance_symmetric<double> DRC_LineWidthStrategy = bgsb::distance_symmetric<double>(0.0) ; // for DRC
@@ -47,7 +55,7 @@ private:
 public:
     Drawer() = default ; 
     Drawer(const DesignRule& designRule, QGraphicsScene *scene=nullptr) ;
-    void set_design_rule(const DesignRule& designRule) ; // 設定Design rule, 並根據規則生成緩衝區策略
+    void set_strategy(const DesignRule& designRule) ; // 設定Design rule, 並根據規則生成緩衝區策略
     void set_design_scence(QGraphicsScene *scene) ; // 設定要畫的QT場景
     
     void draw_label(const Label& label, vector<QGraphicsItem*>& itemBuffer) ;

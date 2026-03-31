@@ -530,7 +530,9 @@ void DetailedRoute3::surrounding_detailed_route(RoutingInfo& routingInfo, vector
             
             vector<PositionNodePtr> end_points ; lowerGroundDetailedNet.get_end_points(end_points) ; sort(end_points.begin(), end_points.end(), [](PositionNodePtr& p1, PositionNodePtr& p2){return p1->x() < p2->x();}) ;
             if(end_points.size()!=2){
-                throw logic_error("Invalid end_points in channel net. | end_points size: " + to_string(end_points.size())) ; 
+                // throw logic_error("Invalid end_points in channel net. | end_points size: " + to_string(end_points.size())) ; 
+                // cout << 
+                continue ;
             }
  
             for(auto& [position, _] : upperGroundDetailedNet) targetNodes.insert(position) ;

@@ -6,6 +6,7 @@ GAConfiguration GlobalGAConfig ;
 SAConfiguration GloablSAConfig ; 
 
 double GlobalExpansionRation = 1.2 ;
+double GlobalCapacityReservationRatio = 1.1 ;
 double GlobalResolution = 100000 ;
 double GlobalEpsilonX = 1e-3 ;
 double GlobalEpsilonY = 1e-3 ;

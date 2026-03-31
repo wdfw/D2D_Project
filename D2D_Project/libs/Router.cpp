@@ -76,7 +76,7 @@ DetailedNet ChannelDetailedNet::to_detailed_net(RoutingGraph& graph) {
     return detailedNet ;
 }
 
-void Router::renew_routing_bumps(RoutingInfo& routingInfo){
+void Router::renew_routing_bumps(RoutingInfo& routingInfo, vector<Bump>& unroutedBumps){
     map<ViaNodePtr, bool> powerPlaneMapping ; 
     map<ViaNodePtr, int> nodeRow ; 
 
@@ -134,6 +134,12 @@ ViaIsRouted:;
 
     routingInfo.routingBumps = newRoutingBumps ;
     routingInfo.offsetVias = newOffsetVias ;
+
+    unroutedBumps.clear() ; 
+    for(auto& offsetVia: routingInfo.offsetVias){
+        Bump& referenceBump = offsetVia.second ; 
+        unroutedBumps.push_back(Bump(referenceBump.die, referenceBump.type, referenceBump.id, {referenceBump.x(), referenceBump.y()})) ; 
+    }
 }
 void Router::solve(const vector<Bump>& bumps, const DesignRule& designRule, const GAConfiguration& GAConfig,
                      const box_xy& boundary, const string& outputDirectory) {
@@ -156,13 +162,8 @@ void Router::solve(const vector<Bump>& bumps, const DesignRule& designRule, cons
     bumpDistance = minimum_distance_between_elements(unroutedBumps) ;
 
     for(int layer = 1;  unroutedBumps.size() ; ++layer){
-        this->outputDirectory = outputDirectory + "/RDL_" + to_string(layer) ; 
-
-        RoutingInfo routingInfo ;
-
-        routingInfo.chipBoundary = layerBoundary ; routingInfo.bumpDistance = bumpDistance ;
-
         timer.set_clock() ;
+        RoutingInfo routingInfo ; routingInfo.chipBoundary = layerBoundary ; routingInfo.bumpDistance = bumpDistance ;
 
         select_routing_bump(unroutedBumps, routingInfo, 9) ;
         adjust_offset_vias(routingInfo, layer-1) ;
@@ -177,27 +178,10 @@ void Router::solve(const vector<Bump>& bumps, const DesignRule& designRule, cons
 
         detailed_route(routingInfo) ; 
         // design_rule_check(routingInfo) ; 
-        // cout << routingInfo.debugEdgeMapping["ERROR_NET"].size() << "\n" ;
 
-        renew_routing_bumps(routingInfo) ;
-
-
-// class Teardrop : public DBI_Key, public segment_xy {
-// public:
-// Teardrop(DieType die, BumpType type, int id, const segment_xy& segment = {{0, 0}, {0, 0}})  
-// : DBI_Key(die, type, id), segment_xy(segment) {}
-// } ;
-
-        cout << "Elapsed Time: " << timer.get_duration_milliseconds() << " ms\n"  ;
-
+        renew_routing_bumps(routingInfo, unroutedBumps) ;
         generate_routing_result(routingInfo, outputDirectory + "/RDL_" + to_string(layer)) ;
-        
-        unroutedBumps.clear() ; 
-
-        for(auto& offsetVia: routingInfo.offsetVias){
-            Bump& referenceBump = offsetVia.second ; 
-            unroutedBumps.push_back(Bump(referenceBump.die, referenceBump.type, referenceBump.id, {referenceBump.x(), referenceBump.y()})) ; 
-        }
+        cout << "Elapsed Time: " << timer.get_duration_milliseconds() << " ms\n"  ;
     }
 }
 
@@ -237,19 +221,15 @@ void Router::select_routing_bump(const vector<Bump>& bumps, RoutingInfo& routing
         }
     }
 
+    bool keepRouting = routingInfo.offsetVias.size() ;
 
-    if(routingInfo.offsetVias.size()){  //代表還有信號點沒繞成功
-        for(int i=0; i<bumps.size(); i++){
-            Bump bump = bumps[i] ; 
-            Bump offsetVia = bumps[i] ; offsetVia.isOffsetVia = true ; 
-            if(bumps[i].type==VSS || bumps[i].type==VDD){
+    for(int i=0; i<bumps.size(); i++){
+        Bump bump = bumps[i] ; 
+        if(bumps[i].type==VSS || bumps[i].type==VDD){
+            if(keepRouting){
+                Bump offsetVia = bumps[i] ; offsetVia.isOffsetVia = true ; 
                 routingInfo.offsetVias.push_back({bump, offsetVia}) ;
-            }
-        }
-    }else{
-        for(int i=0; i<bumps.size(); i++){
-            Bump bump = bumps[i] ; 
-            if(bumps[i].type==VSS || bumps[i].type==VDD){
+            }else{
                 routingInfo.routingBumps.push_back(bump) ;
             }
         }
@@ -285,7 +265,6 @@ void Router::add_dummy_bumps(RoutingInfo& routingInfo){
 
         bumpStacks = routingBumps ; copy(nonOffsetBumps.begin(), nonOffsetBumps.end(), std::back_inserter(bumpStacks));
         
-
         for(int i=0; i<bumpStacks.size(); ++i){
 
             const Bump currentBump = bumpStacks[i] ;
@@ -313,7 +292,7 @@ void Router::add_dummy_bumps(RoutingInfo& routingInfo){
         
                 dummyBumps.push_back(newDummyBump) ;
                 if(!isEdgeBump) bumpStacks.push_back(newDummyBump) ;
-                SearchedExistBump: ;
+SearchedExistBump: ;
             }
         }
 
@@ -343,7 +322,7 @@ void Router::create_vias_and_v2v_edges(const ConnectionMap& combinedConnections,
 
     for(auto& [bump, connectedBumps] : combinedConnections){
         int k_id = graph.vias.size() ; 
-        ViaNodePtr newViaNode = make_shared<ViaNode>(ViaNode(bump.die, bump.type, bump.id, k_id, {bump.x(), bump.y()})) ; 
+        ViaNodePtr newViaNode = make_shared<ViaNode>(ViaNode(bump.die, bump.type, bump.id, {bump.x(), bump.y()})) ; 
         newViaNode->isOffsetVia = bump.isOffsetVia ; newViaNode->isRouting = bump.isRouting ;
 
         graph.vias.insert(newViaNode) ;
@@ -379,7 +358,7 @@ void Router::create_edges_and_via_crossing(RoutingInfo& routingInfo) {
         point_xy centerPoint = {(via1->x()+via2->x())/2, (via1->y()+via2->y())/2} ; 
         int id = graph.edges.size() ; 
         int k_id = graph.edges.size() ; 
-        EdgeNodePtr newEdgeNode = make_shared<EdgeNode>(EdgeNode(dieType, bumpType, id, k_id, centerPoint)) ; 
+        EdgeNodePtr newEdgeNode = make_shared<EdgeNode>(EdgeNode(dieType, bumpType, id, centerPoint)) ; 
         graph.edges.insert(newEdgeNode) ; 
         graph.viaCrossingEdges.insert({v2vEdge, newEdgeNode}) ; 
     }
@@ -387,7 +366,8 @@ void Router::create_edges_and_via_crossing(RoutingInfo& routingInfo) {
 
 void Router::create_positions_and_viaExtendedPositions_and_edgeExtendedPositions(RoutingInfo& routingInfo) {
     RoutingGraph& graph = routingInfo.graph ; 
-    const double sapceWithViaPad = designRule.viaPadRadius + designRule.minimumLineViaPadSpacing + designRule.minimumLineWidth/2 ; //Design Dependent
+
+    const double sapceWithViaPad = designRule.viaPadRadius + designRule.minimumLineViaPadSpacing + designRule.minimumLineWidth ; //Design Dependent
     const double sapceWithoutViaPad = designRule.minimumLineSpacing/2 + designRule.minimumLineWidth/2 ; //Design Dependent
 
     for(auto& via : graph.vias){
@@ -596,7 +576,7 @@ void Router::create_tiles_and_tile_surround_vias(RoutingInfo& routingInfo, int k
         sort(result.begin(), result.end()) ;
 
         if(!occupyTiles.contains(result)){
-            TileNodePtr newTile = make_shared<TileNode>(TileNode(static_cast<DieType>(dieTypeFlag), bumpType, id, k_id, {cx, cy})) ; 
+            TileNodePtr newTile = make_shared<TileNode>(TileNode(static_cast<DieType>(dieTypeFlag), bumpType, id, {cx, cy})) ; 
             graph.tiles.insert(newTile) ; 
             for(auto& via1 : result){
                 for(auto& via2 : result){
@@ -818,7 +798,7 @@ void Router::set_capacity(RoutingInfo& routingInfo) {
         else if(edge->die==DIE12) viaDistance = 0 ; // 逃線區塊不能上下走
 
         // viaDistance = max(viaDistance, 0.0) ;
-        capacity = viaDistance / (designRule.minimumLineSpacing + designRule.minimumLineWidth) ; //Design Dependent
+        capacity = viaDistance / (designRule.minimumLineSpacing + designRule.minimumLineWidth) / GlobalCapacityReservationRatio ; //Design Dependent
         capacity = min(capacity, int(graph.edgeExtendedPositions.at(edge).size())) ; //Design Dependent
         // capacity 包含signal + Vss Nets
         t2tEdge->capacity = (capacity-1)/2 ;
@@ -879,15 +859,12 @@ void Router::combine_connections(const ConnectionMap& connections1, const Connec
 
         for(auto& [bump, _] : connection) dieBump.push_back(bump) ; 
         matrixlize(dieBump, dieMatrix, GlobalEpsilonY) ;
-
-
     }    
-    // if(die1Matrix.size()!=die2Matrix.size()) {
-    //     throw runtime_error("Invaild # of via node rows on 2 dies (" + to_string(die1Matrix.size()) + "," + to_string(die2Matrix.size()) + ")\n") ; 
-    // }
+    if(die1Matrix.size()!=die2Matrix.size()) {
+        throw runtime_error("Invaild # of via node rows on 2 dies (" + to_string(die1Matrix.size()) + "," + to_string(die2Matrix.size()) + ")\n") ; 
+    }
 
-    combinedConnections = connections1 ; 
-    for(auto& [bump, connectedBumps] : connections2) combinedConnections[bump] = connectedBumps ;
+    combinedConnections = connections1 ; for(auto& [bump, connectedBumps] : connections2) combinedConnections[bump] = connectedBumps ;
 
     for(int i=0; i<die1Matrix.size(); ++i){
         combinedConnections[ die1Matrix[i].back() ].insert(die2Matrix[i].front()) ; 

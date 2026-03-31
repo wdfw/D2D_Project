@@ -25,6 +25,7 @@ std::ostream& operator<<(std::ostream& os, const polygon_xy& polygon) ;
 std::ostream& operator<<(std::ostream& os, const multi_point_xy& multi_point) ;
 std::ostream& operator<<(std::ostream& os, const linestring_xy& linestring) ;
 
+
 template <typename T1, typename T2> double distance_sc(const T1& p1, const T2& p2) ;
 template <typename T1, typename T2> double angle_sc(const T1& p1, const T2& p2) ;
 template <typename T1, typename T2, typename T3, typename T4> double is_crossed_sc(const T1& p11, const T2& p12, const T3& p21, const T4& p22) ;

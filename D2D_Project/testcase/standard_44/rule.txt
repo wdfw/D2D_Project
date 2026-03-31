@@ -5,4 +5,4 @@ minimum_line_width 2
 minimum_line_spacing 2
 minimum_line_via_spacing 2
 minimum_via_spacing 2
-minimum_teardropDist 12
+minimum_teardropDist 24
