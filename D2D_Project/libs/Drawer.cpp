@@ -154,7 +154,6 @@ void Drawer::draw_edge(const Edge& edge, vector<QGraphicsItem*>& itemBuffer){
 void Drawer::draw_bump(const Bump &bump, vector<QGraphicsItem*>& itemBuffer){
     multi_polygon_xy buffer, final_outer_buffer;
     point_xy pt(bump) ; 
-    
     QBrush outerBrush(Qt::yellow); 
     QPen outerPen(Qt::yellow); outerPen.setWidth(1);
     Qt::GlobalColor bumpColor = BumpColor[bump.type] ;
